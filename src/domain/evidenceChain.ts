@@ -26,8 +26,6 @@ export const evidenceChainInputSchema = z.strictObject({
   max_records: z.int().min(1).max(200).default(50),
 });
 
-export type EvidenceChainInput = z.output<typeof evidenceChainInputSchema>;
-
 const chainNodeSchema = z.strictObject({
   evidence_id: evidenceIdSchema,
   operation: z.string().min(1),
@@ -66,17 +64,21 @@ export const evidenceChainResultSchema = z.strictObject({
 
 export type EvidenceChainResult = z.output<typeof evidenceChainResultSchema>;
 
-const nodeOf = (evidence: Evidence, depth: number) => ({
+const nodeFields = (evidence: Evidence) => ({
   evidence_id: evidence.evidence_id,
   operation: evidence.operation,
   predicate_type: evidence.predicate_type,
   confidence: evidence.confidence,
   authority: evidence.authority,
-  depth,
   subject: evidence.subject?.name ?? null,
   subject_sha256: evidence.subject?.digest.sha256 ?? null,
   locations: evidence.locations.map((location) => ({ ...location })),
   limitations: [...evidence.limitations],
+});
+
+const nodeOf = (evidence: Evidence, depth: number) => ({
+  ...nodeFields(evidence),
+  depth,
 });
 
 /**
@@ -174,14 +176,13 @@ export const explainEvidenceChain = (
   );
   const omittedRecords = discovered.length - included.length;
   const truncated = omittedRecords > 0 || omittedLinks > 0;
-  const { depth: _rootDepth, ...rootNode } = nodeOf(root, 0);
   const result = evidenceChainResultSchema.parse({
     chain_id: `ec_${digestCanonicalValue(
       { root: root.evidence_id, nodes: included, edges },
       "Evidence chain",
     )}`,
     direction: input.direction,
-    root: chainRootSchema.parse(rootNode),
+    root: chainRootSchema.parse(nodeFields(root)),
     nodes,
     edges,
     missing_links: [...missing].sort(),

@@ -123,7 +123,7 @@ describe("render_session_chart", () => {
     expect(result.value.data.values).toEqual([
       { label: "read_bytes", value: 2 },
     ]);
-    expect(result.value.chart.content).toContain("<title>");
+    expect(result.value.chart.content).toContain("<title");
   });
 
   it("fails with an actionable input error when the aggregate is empty", () => {

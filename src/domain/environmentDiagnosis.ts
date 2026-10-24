@@ -11,10 +11,6 @@ export const diagnoseEnvironmentInputSchema = z.strictObject({
     ),
 });
 
-export type DiagnoseEnvironmentInput = z.output<
-  typeof diagnoseEnvironmentInputSchema
->;
-
 const checkSchema = z.strictObject({
   name: z.string().min(1),
   status: z.enum(["available", "missing", "unsupported", "unknown"]),

@@ -88,6 +88,10 @@ export default defineConfig({
         collapsed: true,
         items: [
           { text: "MCP contracts", link: "/mcp-contracts" },
+          {
+            text: "Evidence audit and reports",
+            link: "/investigation-audit",
+          },
           { text: "Tool design", link: "/tool-design" },
           {
             text: "Admission limits and recovery",

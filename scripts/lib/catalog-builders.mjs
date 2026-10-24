@@ -132,7 +132,11 @@ export const toolFamilyCatalog = (sources) => {
     {
       id: "session",
       surface: "session",
-      contracts: sources.sessionContracts.SESSION_TOOL_CONTRACTS,
+      contracts: [
+        ...sources.sessionContracts.SESSION_TOOL_CONTRACTS,
+        ...sources.investigationAuditContracts
+          .INVESTIGATION_AUDIT_TOOL_CONTRACTS,
+      ],
     },
   ].map(({ id, surface, contracts }) => ({
     id,

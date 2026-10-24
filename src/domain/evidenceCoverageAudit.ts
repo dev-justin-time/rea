@@ -294,7 +294,6 @@ export const auditEvidenceCoverage = (
         : null,
     });
   }
-
   const operationList = [...operations.values()]
     .filter((entry) => lane === undefined || lane.has(entry.operation))
     .sort((left, right) =>
@@ -303,7 +302,21 @@ export const auditEvidenceCoverage = (
         : left.operation > right.operation
           ? 1
           : 0,
-    );
+    )
+    .map((entry) => ({
+      operation: entry.operation,
+      records: entry.records,
+      observed: entry.observed,
+      derived: entry.derived,
+      inferred: entry.inferred,
+      coverage: {
+        complete: entry.complete,
+        partial: entry.partial,
+        unknown: entry.unknown,
+        absent: entry.absent,
+      },
+      contradictions: entry.contradictions,
+    }));
   if (lane !== undefined && operationList.length === 0)
     addGap({
       gap_id: gapId("missing-observation", [input.focus], []),
