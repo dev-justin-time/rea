@@ -23,6 +23,29 @@ const niceCeiling = (maximum: number): number => {
   return step * magnitude;
 };
 
+const renderLegend = (spec: LineChartSpec, top: number): string =>
+  spec.series
+    .map((series, index) => {
+      const x =
+        PADDING +
+        spec.series
+          .slice(0, index)
+          .reduce(
+            (total, earlier) =>
+              total + fitLabel(earlier.label, 180, 13).length * 7.3 + 42,
+            0,
+          );
+      const color =
+        spec.highlight === series.label
+          ? CHART_THEME.ink
+          : CHART_THEME.series[index % CHART_THEME.series.length];
+      return (
+        `<rect x="${x.toFixed(1)}" y="${top + 4}" width="10" height="10" fill="${color}"/>` +
+        `<text x="${(x + 16).toFixed(1)}" y="${top + 13}" font-family="${CHART_THEME.font}" font-size="13" fill="${CHART_THEME.muted}">${escapeXml(fitLabel(series.label, 180, 13))}</text>`
+      );
+    })
+    .join("");
+
 /** Draw one line per series over shared, evenly spaced x-axis labels. */
 export const renderLineChartBody = (
   spec: LineChartSpec,
@@ -102,29 +125,7 @@ export const renderLineChartBody = (
     })
     .join("");
 
-  const legendMarkup = hasLegend
-    ? spec.series
-        .map((series, index) => {
-          const x =
-            PADDING +
-            spec.series
-              .slice(0, index)
-              .reduce(
-                (total, earlier) =>
-                  total + fitLabel(earlier.label, 180, 13).length * 7.3 + 42,
-                0,
-              );
-          const color =
-            spec.highlight === series.label
-              ? CHART_THEME.ink
-              : CHART_THEME.series[index % CHART_THEME.series.length];
-          return (
-            `<rect x="${x.toFixed(1)}" y="${legendTop + 4}" width="10" height="10" fill="${color}"/>` +
-            `<text x="${(x + 16).toFixed(1)}" y="${legendTop + 13}" font-family="${CHART_THEME.font}" font-size="13" fill="${CHART_THEME.muted}">${escapeXml(fitLabel(series.label, 180, 13))}</text>`
-          );
-        })
-        .join("")
-    : "";
+  const legendMarkup = hasLegend ? renderLegend(spec, legendTop) : "";
 
   const unitMarkup =
     spec.unit === undefined

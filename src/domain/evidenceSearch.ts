@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Evidence } from "./evidence.js";
 import type { EvidenceBundle } from "./evidenceBundle.js";
 import { digestSchema } from "./digests.js";
+import { compareUnicodeCodePoints } from "./unicodeCodePointOrder.js";
 import {
   evidenceMatchesFilters,
   evidenceRecordFiltersSchema,
@@ -212,7 +213,10 @@ export const searchEvidenceBundle = (
   scored.sort(
     (left, right) =>
       right.score - left.score ||
-      left.evidence.evidence_id.localeCompare(right.evidence.evidence_id),
+      compareUnicodeCodePoints(
+        left.evidence.evidence_id,
+        right.evidence.evidence_id,
+      ),
   );
   return {
     kind: "evidence-search",

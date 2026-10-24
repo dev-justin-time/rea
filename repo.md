@@ -2,7 +2,8 @@
 
 This file records every upstream repository this working tree draws on, what each
 one contributes, where it lands in the codebase, and what was deliberately not
-integrated. REA itself is `morluto/rea`.
+integrated. REA itself is `morluto/rea`. The requirement master list, statuses,
+integration rules and remaining gaps are in [requirements.md](requirements.md).
 
 ## Integration order
 
@@ -23,14 +24,18 @@ embedded in the analysis pipeline.
 
 ## Upstream repositories
 
-| Repository                                                                          | License                                             | Role in this repo                                                                                                                                                                                                           | Landed in                                                                                                                  | Status                                  |
-| ----------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| [morluto/rea](https://github.com/morluto/rea)                                       | MIT                                                 | Base product: CLI + MCP server for reverse engineering.                                                                                                                                                                     | Whole tree                                                                                                                 | Baseline (branch `main`)                |
-| [NationalSecurityAgency/ghidra](https://github.com/NationalSecurityAgency/ghidra)   | Apache-2.0                                          | Decompiler and analysis engine. REA imports one target into an ephemeral headless Ghidra database and talks to it over an authenticated socket. Bring-your-own installation, pinned to the verified release line.           | `bridge/ghidra/*.java`, `src/ghidra/`                                                                                      | Integrated (existing + extended)        |
-| [bethington/ghidra-mcp](https://github.com/bethington/ghidra-mcp)                   | Apache-2.0                                          | Feature reference for Ghidra-facing MCP capabilities. No code is vendored; REA implements the gaps natively in its own bridge instead of adopting the GUI extension/bridge pair.                                            | `bridge/ghidra/ReaGhidraBridge.java`, `src/domain/native/`, `src/contracts/officialToolContracts.ts`                       | Partially integrated (P-code emulation) |
-| [mattpocock/skills](https://github.com/mattpocock/skills)                           | MIT                                                 | Agent engineering workflows (grilling, TDD, bug diagnosis, architecture review, spec/ticket flow). These are agent instructions, not runtime features.                                                                      | Not vendored; install per-agent (`npx skills add mattpocock/skills`) alongside `.agents/skills/reverse-engineer-anything/` | Documented, not embedded                |
-| [mksglu/context-mode](https://github.com/mksglu/context-mode)                       | Elastic License 2.0 (source-available, **not** OSI) | MCP server that keeps raw tool output out of the model context, indexes session events in SQLite/FTS5, and retrieves only relevant slices. ELv2 forbids copying it into this MIT project, so only the _pattern_ is adopted. | `src/domain/evidenceSearch.ts`, `src/application/investigation/SearchEvidence.ts`, session tool `search_evidence`          | Pattern integrated                      |
-| [ranxianglei/billion-context-pi](https://github.com/ranxianglei/billion-context-pi) | MIT                                                 | Pi-host extension for model-driven, multi-tier context compression plus `search_context` over compressed blocks. Pi-specific event interception has no equivalent in an MCP server, so only its retrieval model is used.    | `src/domain/evidenceSearch.ts` (bounded search over retained observations)                                                 | Pattern integrated                      |
+| Repository                                                                                            | License                                             | Role in this repo                                                                                                                                                                                                           | Landed in                                                                                                                  | Status                                  |
+| ----------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| [morluto/rea](https://github.com/morluto/rea)                                                         | MIT                                                 | Base product: CLI + MCP server for reverse engineering.                                                                                                                                                                     | Whole tree                                                                                                                 | Baseline (branch `main`)                |
+| [NationalSecurityAgency/ghidra](https://github.com/NationalSecurityAgency/ghidra)                     | Apache-2.0                                          | Decompiler and analysis engine. REA imports one target into an ephemeral headless Ghidra database and talks to it over an authenticated socket. Bring-your-own installation, pinned to the verified release line.           | `bridge/ghidra/*.java`, `src/ghidra/`                                                                                      | Integrated (existing + extended)        |
+| [bethington/ghidra-mcp](https://github.com/bethington/ghidra-mcp)                                     | Apache-2.0                                          | Feature reference for Ghidra-facing MCP capabilities. No code is vendored; REA implements the gaps natively in its own bridge instead of adopting the GUI extension/bridge pair.                                            | `bridge/ghidra/ReaGhidraBridge.java`, `src/domain/native/`, `src/contracts/officialToolContracts.ts`                       | Partially integrated (P-code emulation) |
+| [mattpocock/skills](https://github.com/mattpocock/skills)                                             | MIT                                                 | Agent engineering workflows (grilling, TDD, bug diagnosis, architecture review, spec/ticket flow). These are agent instructions, not runtime features.                                                                      | Not vendored; install per-agent (`npx skills add mattpocock/skills`) alongside `.agents/skills/reverse-engineer-anything/` | Documented, not embedded                |
+| [mksglu/context-mode](https://github.com/mksglu/context-mode)                                         | Elastic License 2.0 (source-available, **not** OSI) | MCP server that keeps raw tool output out of the model context, indexes session events in SQLite/FTS5, and retrieves only relevant slices. ELv2 forbids copying it into this MIT project, so only the _pattern_ is adopted. | `src/domain/evidenceSearch.ts`, `src/application/investigation/SearchEvidence.ts`, session tool `search_evidence`          | Pattern integrated                      |
+| [ranxianglei/billion-context-pi](https://github.com/ranxianglei/billion-context-pi)                   | MIT                                                 | Pi-host extension for model-driven, multi-tier context compression plus `search_context` over compressed blocks. Pi-specific event interception has no equivalent in an MCP server, so only its retrieval model is used.    | `src/domain/evidenceSearch.ts` (bounded search over retained observations)                                                 | Pattern integrated                      |
+| [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design)                       | MIT                                                 | Editorial diagram rules: flat surfaces, no shadows or filters, restrained palette, real text, self-contained HTML/SVG. REA adopts the rules and its own renderer; no skill assets are vendored.                             | `src/domain/charts/`, `scripts/render-chart-figure.mjs`, `website/figures.md`                                              | Rules + tooling integrated              |     | [heygen-com/hyperframes](https://github.com/heygen-com/hyperframes) | Apache-2.0 | HTML/CSS + seekable GSAP → deterministic MP4. Dev dependency (`0.8.190` in the lockfile) behind the opt-in chart-video export; rendering needs Chrome and FFmpeg. | `scripts/render-chart-video.mjs`, `package.json` | Integrated (opt-in render) |
+| [heygen-com/hyperframes-community-skills](https://github.com/heygen-com/hyperframes-community-skills) | Apache-2.0                                          | Community HyperFrames workflows (explainers, captions, paint animation). Agent instructions for video production, not runtime chart code.                                                                                   | Not vendored; install per-agent with `npx skills add heygen-com/hyperframes`                                               | Documented, not embedded                |
+| [heygen-com/liveavatar-gpt-live-demos](https://github.com/heygen-com/liveavatar-gpt-live-demos)       | MIT                                                 | Real-time LiveAvatar + GPT demos. Contains no chart, diagram or rendering code.                                                                                                                                             | Not applicable                                                                                                             | Not integrated                          |
+| [heygen-com/liveavatar-sales-agent](https://github.com/heygen-com/liveavatar-sales-agent)             | MIT                                                 | Next.js talking-head sales agent with LiveAvatar, Anthropic and CRM integrations. No charting surface to upgrade.                                                                                                           | Not applicable                                                                                                             | Not integrated                          |
 
 ## What was integrated
 
@@ -94,6 +99,35 @@ the model context. Their agent-side features (hook injection, event indexing,
 `compress`, Pi event interception) do not apply to an MCP analysis server and are
 not copied.
 
+### Charts and chart videos (diagram-design + HyperFrames)
+
+Charts are one shared renderer, not three implementations:
+
+- `src/domain/charts/` renders **bar**, **line** and **call_graph** figures with
+  the website palette, 26/15/14/13px type scale, hairline rules and one blue
+  accent. Output is self-contained SVG with `<title>`/`<desc>`, `role="img"`,
+  escaped text, deterministic ids and no filters or shadows.
+- `renderChart` returns the SVG, or a standalone HTML page, plus its exact
+  canvas size. Inputs are validated: unique labels, one value per x label, real
+  edge endpoints, bounded categories/series/nodes/edges.
+- **`render_native_chart`** (MCP, read-only) exposes the same renderer for bar,
+  line and explicit call-graph data. It adds no observations and records no
+  Evidence.
+- **`get_call_graph`** now accepts `render: none | svg | html`. The graph REA
+  already traverses from Ghidra is projected straight into the layered chart,
+  so charting costs no extra provider round trips. Graphs above 128 functions
+  or 512 calls are capped with an explicit limitation, never a silently
+  complete-looking chart.
+- Website authors render committed figures with
+  `npm run chart:figure -- spec.json --out public/assets/figures/name.svg`.
+  `scripts/verify-website.py` now rejects published figures without a `viewBox`
+  or non-empty `<title>`, and any that introduce a filter or shadow.
+- `scripts/render-chart-video.mjs` wraps the same SVG in a 1920×1080
+  HyperFrames composition, animates `.chart-bar`, `.chart-line`, `.chart-dot`
+  or `.chart-node` with a paused GSAP timeline, runs `hyperframes check`, then
+  renders MP4 when FFmpeg is available. The checked composition and a 6.0s MP4
+  were produced locally; the frame was inspected.
+
 ## Deliberately not integrated
 
 - **context-mode code** — ELv2 is incompatible with redistributing this MIT
@@ -105,6 +139,13 @@ not copied.
   natively instead.
 - **mattpocock skills content** — kept as an optional agent install rather than
   product content, so REA's packaged skill surface stays focused and reviewable.
+- **diagram-design skill bundle** — its HTML+SVG rules are adopted, but its 45
+  templates and plugin manifests are not vendored; REA's renderer emits figures
+  in the site's own system instead.
+- **HyperFrames community skills** — video-production instructions, not runtime
+  code. Agents can install them separately; the repository only pins the CLI.
+- **LiveAvatar demos and sales agent** — real-time avatar applications with no
+  chart, diagram or figure pipeline. Adding them would not upgrade chart making.
 
 ## Verification
 
@@ -113,6 +154,25 @@ not copied.
   complete bridge compiles against Ghidra 12.1.4 / Java 21.
 - Real headless bridge session — inventory + emulation exercised over the
   authenticated loopback transport.
-- `vitest` for the new domain and contract tests — passes; four unrelated baseline
-  failures remain on this host (three `procedure_references` fixture assertions and
-  one `toolEffects` destructive-list assertion), reproducible without these changes.
+- `vitest run src/domain/charts src/application/native/CallGraphChart.test.ts` —
+  14 tests pass (validation, escaping, layout, caps, HTML delivery).
+- `npx tsc -p tsconfig.build.json` — the chart core and both scripts build and run.
+- HyperFrames `check` on a generated call-graph composition — `ok: true`, zero
+  lint and runtime findings; `render --quality draft` produced a 6.0s, 71 KB MP4.
+- `npm run metadata:check`, `npm run verify:architecture-guards`,
+  `npm run verify:module-boundaries`, `npm run verify:test-discovery` and
+  `knip` — pass.
+- After `npm run compile`, the MCP stdio server lists 224 tools including
+  `render_native_chart`; calling it returned a titled SVG in `result.content`.
+- `npm run check` cannot complete on this host because the Windows native
+  controls are absent (`native/windows/build/manifest.json`); the individual
+  checks above were run instead.
+- The new website figure rule was exercised against a fixture site: a valid
+  figure passed, a missing `<title>` failed, a filter failed, and a non-figure
+  SVG was ignored. The full `python3 scripts/website.py check` was not run
+  because the website Python environment cannot be installed here (CairoSVG is
+  unavailable on this host).
+- Unrelated baseline failures still occur on this host: the `toolEffects`
+  destructive-list assertion, a self-contained `toolInputReferences` case, and
+  three Windows file-lock tests under `src/server`. Reproducible without these
+  changes.

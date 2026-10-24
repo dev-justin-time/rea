@@ -91,5 +91,3 @@ export const nativeEmulationSchema = z
         message: "Emulation fault text must accompany exactly a fault outcome",
       });
   });
-
-export type NativeEmulation = z.infer<typeof nativeEmulationSchema>;
