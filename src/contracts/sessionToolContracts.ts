@@ -14,6 +14,7 @@ import {
 import { reconstructionVerificationInputSchema } from "../domain/reconstructionVerificationSchemas.js";
 import { staticRuntimeCorrelationInputSchema } from "../domain/staticRuntimeCorrelation.js";
 import { searchEvidenceInputSchema } from "../domain/evidenceSearch.js";
+import { renderChartInputSchema } from "../domain/charts/chartSpec.js";
 import { sessionOutputSchemas } from "./toolOutputSchemaGroups.js";
 import { requireOutputSchema } from "./toolOutputSchemaPrimitives.js";
 import {
@@ -168,6 +169,11 @@ export const SESSION_TOOL_CONTRACTS = [
     "get_evidence_bundle",
     "Return every retained Evidence record and residual unknown as a complete canonical bundle by default. detail=summary discovers retained records without copying or transferring their payloads; optionally filter by exact Evidence ID, operation, target SHA-256, analysis-profile digest or canonical native procedure address. Metadata distinguishes complete record retention from native value-flow truncation or unavailable/unknown coverage. Use a discovered evidence_id with inspect_analysis_view without restarting a provider. Filters apply only to summary delivery.",
     getEvidenceBundleInputSchema,
+  ),
+  session(
+    "render_native_chart",
+    "Render observed analysis data as one editorial, self-contained chart. Accepts ordered bar magnitudes, numeric line series, or an explicit call graph, and returns SVG or a standalone HTML page. The chart is presentation only: it adds no observations, and its title, description and values are exactly the supplied data.",
+    renderChartInputSchema,
   ),
   session(
     "search_evidence",

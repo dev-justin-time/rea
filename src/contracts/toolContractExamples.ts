@@ -59,6 +59,13 @@ export const TOOL_EXAMPLE_OVERRIDES: Readonly<
   open_bundle_resources: { path: "/tmp/Fixture.app" },
   export_evidence_bundle: { path: "/tmp/evidence.json" },
   search_evidence: { query: "authorization", limit: 5 },
+  render_native_chart: {
+    chart: {
+      kind: "bar",
+      title: "Observed callers",
+      items: [{ label: "main", value: 3 }],
+    },
+  },
   get_evidence_bundle: {
     detail: "summary",
     filters: { operation: "analyze_function", procedure_address: "0x1000" },

@@ -712,6 +712,7 @@ export const TOOL_EFFECTS: Readonly<Record<string, ToolEffects>> = {
   }),
   get_evidence_bundle: effects(),
   search_evidence: effects(),
+  render_native_chart: effects(),
   get_navigation_context: effects({ mutatesSession: true }),
   inspect_address_context: effects({ mutatesSession: true }),
   import_evidence_bundle: effects({ mutatesSession: true }),

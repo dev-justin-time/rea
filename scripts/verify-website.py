@@ -318,6 +318,44 @@ def check_search_metadata(site, pages):
     return len(indexable), errors
 
 
+FIGURE_PATTERN = re.compile(
+    r"(?:^|/)assets/(?:figures/[^/]+|social-card)\.svg$"
+)
+
+
+def check_figure_design(site):
+    """Enforce the shared editorial chart rules on published figure sources."""
+    errors = []
+    for path in sorted(site.rglob("*.svg")):
+        relative = path.relative_to(site).as_posix()
+        if not FIGURE_PATTERN.search(relative):
+            continue
+        try:
+            root = ET.parse(path).getroot()
+        except ET.ParseError as error:
+            errors.append(f"{relative}: invalid SVG XML: {error}")
+            continue
+        if root.get("viewBox") is None:
+            errors.append(
+                f"{relative}: figure needs a viewBox so it scales without layout shift"
+            )
+        title = next(
+            (child for child in root if child.tag.rsplit("}", 1)[-1] == "title"),
+            None,
+        )
+        if title is None or not (title.text or "").strip():
+            errors.append(
+                f"{relative}: figure needs a non-empty <title> for assistive technology"
+            )
+        source = path.read_text(encoding="utf-8")
+        for forbidden in ("<filter", "filter=", "drop-shadow", "box-shadow"):
+            if forbidden in source:
+                errors.append(
+                    f"{relative}: figure uses {forbidden}; figures stay shadow-free and flat"
+                )
+    return errors
+
+
 def check_site(site):
     """Check assets, HTML fragment destinations and SVG syntax."""
     site = site.resolve()
@@ -380,6 +418,7 @@ def check_site(site):
             ET.parse(path)
         except ET.ParseError as error:
             errors.append(f"{path.relative_to(site)}: invalid SVG XML: {error}")
+    errors.extend(check_figure_design(site))
     indexable, metadata_errors = check_search_metadata(site, pages)
     errors.extend(metadata_errors)
     return len(pages), references, indexable, errors

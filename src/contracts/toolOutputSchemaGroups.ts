@@ -35,6 +35,7 @@ import { bundleResourceRootSchema } from "../domain/apple/bundleResourceRoot.js"
 import { nativeDataTypeSchema } from "../domain/native/nativeDataType.js";
 import { nativeEmulationSchema } from "../domain/native/nativeEmulation.js";
 import { evidenceSearchResultSchema } from "../domain/evidenceSearch.js";
+import { renderedChartSchema } from "../domain/charts/chartSpec.js";
 import { nativeCallObservationResultSchema } from "../domain/native/nativeCallObservation.js";
 import {
   nativeInstructionSchema,
@@ -347,6 +348,7 @@ export const enhancedOutputSchemas: Readonly<Record<string, z.ZodObject>> = {
     z.strictObject({
       graph: z.record(z.string(), z.array(graphNode)),
       limitations: z.array(z.string()),
+      chart: renderedChartSchema.optional(),
     }),
   ),
   analyze_swift_types: evidenceResultOf(
@@ -581,6 +583,7 @@ export const sessionOutputSchemas = {
     z.union([evidenceBundleSchema, evidenceBundleSummarySchema]),
   ),
   search_evidence: lifecycleResultOf(evidenceSearchResultSchema),
+  render_native_chart: lifecycleResultOf(renderedChartSchema),
   get_navigation_context: lifecycleResultOf(
     z.object({
       document: z.string(),

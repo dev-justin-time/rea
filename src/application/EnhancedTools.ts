@@ -64,6 +64,7 @@ import { resolveXrefsName } from "./XrefsAddressResolution.js";
 import { resolveProcedureAddress } from "./ProcedureAddressResolution.js";
 import { traceLiteralFeature } from "./EnhancedLiteralTracing.js";
 import { projectNativeApiInspection } from "./native/NativeApiInspection.js";
+import { callGraphChart } from "./native/CallGraphChart.js";
 
 type BatchProcedureIdentity =
   | {
@@ -561,6 +562,7 @@ export class EnhancedTools {
     input: {
       readonly address: string;
       readonly direction: CallRelationshipDirection;
+      readonly render: "none" | "svg" | "html";
     },
     signal?: AbortSignal,
   ): EnhancedResult {
@@ -662,9 +664,17 @@ export class EnhancedTools {
         }
       }
     }
+    const rendered =
+      input.render === "none"
+        ? undefined
+        : callGraphChart(graph, startAddress, input.render);
+    if (rendered !== undefined)
+      for (const limitation of rendered.limitations)
+        limitations.add(limitation);
     return ok({
       graph,
       limitations: [...limitations].sort(compareUnicodeCodePoints),
+      ...(rendered === undefined ? {} : { chart: rendered.chart }),
     });
   }
 

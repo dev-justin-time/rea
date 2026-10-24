@@ -15,6 +15,34 @@ The published diagrams are SVG source assets:
 - `public/assets/figures/th04-bullet-ring.svg` — 1000 × 520 viewBox.
 - `public/assets/figures/analyst-thinking.svg` — 160 × 120 viewBox.
 
+## Data-driven charts
+
+A figure that plots analysis data is authored as a JSON chart specification and
+rendered with the same TypeScript renderer the MCP `render_native_chart` tool
+uses. The renderer lives in `src/domain/charts/`; it draws horizontal bars,
+multi-series lines and depth-layered call graphs with the site's white paper,
+charcoal ink, slate text and single blue accent. No shadows, filters, gradients
+or third-party chart runtime are involved.
+
+Compile the renderer once, then render a committed SVG figure:
+
+```sh
+npm run compile
+npm run chart:figure -- figures/callers.json --out public/assets/figures/callers.svg
+```
+
+A specification is a JSON object with `kind` set to `bar`, `line` or
+`call_graph`. Bars take `items` of `{label, value, note?}`; lines take shared
+`labels` and one value array per `series`; call graphs take `nodes` of
+`{id, label, depth?}` and directed `edges`. Cap labels at 120 characters and
+prefer one highlight per figure. Every chart carries a title, an optional
+one-sentence description, and an accessible `<title>`/`<desc>`.
+
+The MCP tool returns the same SVG (or a standalone HTML page) from analysis
+results, so an investigation can publish the exact figure it inspected. Commit
+the rendered SVG: the website build and publication do not need Node or the
+renderer.
+
 Two original layout references were generated with the built-in image generation
 tool and reviewed visually. Their prompts are retained below. The final SVGs
 preserve the white background, charcoal/slate/blue palette and layout while
@@ -41,7 +69,9 @@ image generation or game screenshot is used for this mathematical figure.
 Check spelling, arithmetic order, arrow directions and the separate verification
 branches when changing these figures. Match progress claims to the pinned
 reconstruction checkpoint. Validate the SVG as XML and inspect its browser
-rendering at desktop and mobile widths.
+rendering at desktop and mobile widths. `python3 scripts/website.py check`
+rejects a figure without a `viewBox` or non-empty `<title>`, and one that uses
+a filter or shadow.
 
 ## Sharing preview
 

@@ -35,6 +35,12 @@ export const enhancedInputSchemas = {
         "A procedure symbol or address to resolve to its canonical entry",
       ),
     direction: callRelationshipDirectionSchema,
+    render: z
+      .enum(["none", "svg", "html"])
+      .default("none")
+      .describe(
+        "Also render the observed graph as a self-contained chart: svg for embedding, html for a standalone page, none for the graph alone. The chart is a view of the same observed nodes and cites no additional evidence.",
+      ),
   }),
   analyze_swift_types: z.strictObject({
     category: z
