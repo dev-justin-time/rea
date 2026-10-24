@@ -161,6 +161,13 @@ export const limitationsFor = (operation: string): readonly string[] => {
     case "procedure_callers":
     case "procedure_callees":
       return common;
+    case "emulate_native_function":
+      return [
+        ...common,
+        "Emulation runs Ghidra p-code in an isolated emulator state with a bounded step count. It does not execute the target process, emulate operating-system APIs or syscalls, or prove equivalence with native execution.",
+        "Only caller-supplied registers and memory are initialized. Stack arguments, global writes made before the emulated function, and unresolved external calls remain outside the observation and fault or stay unknown.",
+        "Register and memory values describe the emulator's final state after a sentinel return, step limit, or fault; they are not a process memory snapshot and are discarded with the session.",
+      ];
     case "xrefs":
       return [
         ...common,

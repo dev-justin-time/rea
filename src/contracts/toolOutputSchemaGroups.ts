@@ -31,6 +31,7 @@ import { nativeUiResultSchema } from "../domain/native/nativeUiObservation.js";
 import { nativeValueTraceSchema } from "../domain/native/nativeValueTrace.js";
 import { bundleResourceRootSchema } from "../domain/apple/bundleResourceRoot.js";
 import { nativeDataTypeSchema } from "../domain/native/nativeDataType.js";
+import { nativeEmulationSchema } from "../domain/native/nativeEmulation.js";
 import { nativeCallObservationResultSchema } from "../domain/native/nativeCallObservation.js";
 import {
   nativeInstructionSchema,
@@ -167,6 +168,7 @@ export const officialOutputSchemas: Readonly<Record<string, z.ZodObject>> = {
   procedure_callers: evidenceResultOf(addressList),
   procedure_info: procedureInfoOutput,
   read_function_instructions: evidenceResultOf(functionInstructionWindowSchema),
+  emulate_native_function: evidenceResultOf(nativeEmulationSchema),
   read_bytes: evidenceResultOf(nativeByteReadSchema),
   address_to_file_offset: evidenceResultOf(
     z.object({

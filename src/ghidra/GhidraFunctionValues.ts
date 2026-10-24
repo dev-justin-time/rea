@@ -28,6 +28,10 @@ import {
   type JsonValue,
 } from "../domain/jsonValue.js";
 import { nativeApiBoundarySchema } from "../domain/native/nativeApiBoundary.js";
+import {
+  nativeEmulationInputSchema,
+  nativeEmulationSchema,
+} from "../domain/native/nativeEmulation.js";
 import { nativeValueFlowSchema } from "../domain/native/nativeValueFlow.js";
 import type { EvidenceLocation } from "../domain/evidence.js";
 import {
@@ -58,6 +62,7 @@ export const GHIDRA_FUNCTION_OPERATIONS = [
   "procedure_pseudo_code",
   "read_function_instructions",
   "procedure_references",
+  "emulate_native_function",
   "xrefs",
 ] as const;
 
@@ -102,6 +107,7 @@ const inputSchemas = {
   procedure_info: z.object(directProcedure).strict(),
   procedure_pseudo_code: z.object(directProcedure).strict(),
   read_function_instructions: z.object(directProcedure).strict(),
+  emulate_native_function: nativeEmulationInputSchema,
   procedure_references: z
     .object({
       ...directProcedure,
@@ -387,6 +393,7 @@ const resultSchemas = {
   procedure_info: procedureInfo,
   procedure_pseudo_code: z.string().nullable(),
   read_function_instructions: ghidraFunctionInstructionWindow,
+  emulate_native_function: nativeEmulationSchema,
   inspect_native_instruction: nativeInstructionSchema,
   inspect_native_data_type: nativeDataTypeSchema,
   resolve_native_call_targets: nativeCallTargetsSchema,
@@ -404,6 +411,7 @@ const functionBoundaryObservationOperations: ReadonlySet<GhidraFunctionOperation
     "procedure_pseudo_code",
     "procedure_references",
     "read_function_instructions",
+    "emulate_native_function",
   ]);
 
 const functionObservationEnvelope = z.strictObject({

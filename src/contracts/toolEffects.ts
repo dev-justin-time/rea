@@ -519,6 +519,7 @@ export const TOOL_EFFECTS: Readonly<Record<string, ToolEffects>> = {
   procedure_callers: evidence,
   procedure_info: evidence,
   read_function_instructions: evidence,
+  emulate_native_function: evidence,
   inspect_native_instruction: evidence,
   inspect_native_data_type: evidence,
   resolve_native_call_targets: evidence,

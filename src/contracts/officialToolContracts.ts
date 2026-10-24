@@ -14,6 +14,7 @@ import {
 import type { ToolContract } from "./toolContractTypes.js";
 import { toolContractMetadata } from "./toolEffects.js";
 import { nativeDataTypeInputSchema } from "../domain/native/nativeDataType.js";
+import { nativeEmulationInputSchema } from "../domain/native/nativeEmulation.js";
 import { nativeInstructionInputSchema } from "../domain/native/nativeInstruction.js";
 import { functionInstructionInputSchema } from "./functionInstructionContract.js";
 import { HOPPER_MEMORY_TOOL_DEFINITIONS } from "./hopperMemoryContracts.js";
@@ -179,6 +180,11 @@ export const OFFICIAL_TOOL_CONTRACTS = [
     "read_function_instructions",
     "Return every raw instruction for one analyzed procedure. Instruction text and body extent are provider-specific. Ghidra terminal-call assumptions that may cut the analyzed body are reported in limitations.",
     functionInstructionInputSchema,
+  ),
+  official(
+    "emulate_native_function",
+    "Run one analyzed local procedure in Ghidra's isolated p-code emulator with caller-supplied registers and memory, bounded by max_steps and optional read-back regions. Returns the stop outcome, final PC, changed or explicitly requested register values, and requested memory bytes. Emulation does not execute the target process, emulate OS APIs, seed stack arguments automatically, or prove native equivalence; unresolved external calls and unseeded stack state fault or remain unknown. Ghidra-only: other providers report the operation unsupported.",
+    nativeEmulationInputSchema,
   ),
   ...HOPPER_MEMORY_TOOL_DEFINITIONS.map(({ name, description, inputSchema }) =>
     official(name, description, inputSchema),

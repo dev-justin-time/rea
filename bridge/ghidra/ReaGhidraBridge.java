@@ -51,6 +51,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import ghidra.app.emulator.EmulatorHelper;
 import ghidra.app.util.headless.HeadlessScript;
 import ghidra.app.decompiler.DecompInterface;
 import ghidra.app.decompiler.DecompileOptions;
@@ -171,6 +172,7 @@ public final class ReaGhidraBridge extends HeadlessScript {
         "inspect_native_data_type",
         "resolve_native_call_targets",
         "procedure_references",
+        "emulate_native_function",
         "xrefs"
     };
 
@@ -452,6 +454,7 @@ public final class ReaGhidraBridge extends HeadlessScript {
             case "procedure_pseudo_code" -> procedurePseudocode(request.params);
             case "read_function_instructions" -> readFunctionInstructions(request.params);
             case "procedure_references" -> procedureReferences(request.params);
+            case "emulate_native_function" -> emulateNativeFunction(request.params);
             case "resolve_containing_procedure" -> containingProcedure(request.params);
             case "search_procedures" -> search(request.params, true);
             case "search_strings" -> search(request.params, false);
@@ -1119,6 +1122,485 @@ public final class ReaGhidraBridge extends HeadlessScript {
                 currentProgram.getListing().getInstructions(function.getBody(), true)
             )
         );
+    }
+
+    private static final int MAX_EMULATION_STEPS = 100_000;
+    private static final int MAX_EMULATION_REGISTERS = 64;
+    private static final int MAX_EMULATION_MEMORY_BYTES = 1_048_576;
+    private static final int MAX_EMULATION_READ_BYTES = 65_536;
+    private static final int EMULATION_STACK_RESERVE = 0x10000;
+
+    /**
+     * Emulate one local function in Ghidra's p-code emulator with explicit
+     * register and memory seeds. The emulator state is isolated: program bytes
+     * and the analysis database are not modified.
+     */
+    private JsonObject emulateNativeFunction(JsonObject params) throws Exception {
+        requireKeys(params, Set.of(
+            "document",
+            "procedure",
+            "registers",
+            "memory",
+            "read_memory",
+            "max_steps",
+            "return_registers"
+        ));
+        requireDocument(params);
+        String selector = requireString(params, "procedure");
+        int maxSteps = requireBoundedInteger(params, "max_steps", 1, MAX_EMULATION_STEPS);
+        Map<Register, BigInteger> seeds = emulationRegisterSeeds(
+            requireEmulationObject(params, "registers")
+        );
+        List<EmulationMemoryWrite> writes = emulationMemoryWrites(
+            requireEmulationArray(params, "memory")
+        );
+        List<EmulationMemoryRead> reads = emulationMemoryReads(
+            requireEmulationArray(params, "read_memory")
+        );
+        List<Register> requested = emulationReturnRegisters(
+            requireEmulationArray(params, "return_registers")
+        );
+        Function function = resolveProcedure(selector);
+        if (function.isExternal() || function.getBody().isEmpty()) {
+            throw new RequestFailure(
+                "invalid_request",
+                "Ghidra cannot emulate a function without an analyzed local body: " +
+                    procedureName(function)
+            );
+        }
+        Address entry = function.getEntryPoint();
+        if (!currentProgram.getMemory().contains(entry)) {
+            throw new RequestFailure(
+                "invalid_request",
+                "Function entry has no mapped memory in this session: " +
+                    canonicalAddress(entry)
+            );
+        }
+        EmulatorHelper emulator = new EmulatorHelper(currentProgram);
+        JsonArray limitations = new JsonArray();
+        limitations.add(
+            "Emulation runs Ghidra p-code in an isolated emulator state. It does not execute the target process or emulate operating-system APIs, syscalls, or external library behavior."
+        );
+        limitations.add(
+            "Only caller-supplied registers and memory are initialized; stack arguments and global state come from the analyzed image. Calls into unresolved external thunks fault."
+        );
+        try {
+            Address sentinel = prepareEmulation(emulator, entry, seeds, writes, limitations);
+            Map<Register, BigInteger> before = emulationRegisterSnapshot(emulator);
+            int steps = 0;
+            boolean returned = false;
+            String fault = null;
+            while (steps < maxSteps) {
+                monitor.checkCancelled();
+                steps++;
+                if (!emulator.step(monitor)) {
+                    fault = emulator.getLastError();
+                    if (fault == null || fault.isEmpty()) fault = "unknown emulator fault";
+                    break;
+                }
+                Address pc = emulator.getExecutionAddress();
+                if (sentinel != null && pc != null && pc.equals(sentinel)) {
+                    returned = true;
+                    break;
+                }
+            }
+            String outcome = returned ? "returned" : fault == null ? "step_limit" : "fault";
+            Address finalPc = emulator.getExecutionAddress();
+            JsonArray values = new JsonArray();
+            int omitted = 0;
+            List<Register> reported = requested.isEmpty()
+                ? emulationChangedRegisters(emulator, before)
+                : requested;
+            for (Register register : reported) {
+                BigInteger value;
+                try {
+                    value = emulator.readRegister(register);
+                }
+                catch (RuntimeException unavailable) {
+                    continue;
+                }
+                if (values.size() >= MAX_EMULATION_REGISTERS) {
+                    omitted++;
+                    continue;
+                }
+                JsonObject item = new JsonObject();
+                item.addProperty("name", register.getName());
+                item.addProperty("value_hex", emulationHex(value, register.getBitLength()));
+                values.add(item);
+            }
+            JsonArray memory = new JsonArray();
+            for (EmulationMemoryRead read : reads) {
+                JsonObject item = new JsonObject();
+                item.addProperty("address", canonicalAddress(read.address()));
+                item.addProperty("length", read.length());
+                try {
+                    byte[] bytes = emulator.readMemory(read.address(), read.length());
+                    item.addProperty("hex", java.util.HexFormat.of().formatHex(bytes));
+                    item.add("error", JsonNull.INSTANCE);
+                }
+                catch (Exception unreadable) {
+                    item.add("hex", JsonNull.INSTANCE);
+                    item.addProperty("error", safeMessage(unreadable));
+                }
+                memory.add(item);
+            }
+            JsonObject result = new JsonObject();
+            result.addProperty("outcome", outcome);
+            result.addProperty("function_name", procedureName(function));
+            result.addProperty("entry_address", canonicalAddress(entry));
+            result.addProperty("steps", steps);
+            result.addProperty("max_steps", maxSteps);
+            result.addProperty("final_pc", finalPc == null ? null : canonicalAddress(finalPc));
+            result.addProperty("fault", fault);
+            result.add("registers", values);
+            result.add("memory", memory);
+            result.addProperty("omitted_registers", omitted);
+            JsonObject envelope = new JsonObject();
+            envelope.add("value", result);
+            envelope.add("limitations", limitations);
+            return envelope;
+        }
+        finally {
+            emulator.dispose();
+        }
+    }
+
+    private Address prepareEmulation(
+            EmulatorHelper emulator,
+            Address entry,
+            Map<Register, BigInteger> seeds,
+            List<EmulationMemoryWrite> writes,
+            JsonArray limitations) throws Exception {
+        Register pc = emulator.getPCRegister();
+        if (pc == null) {
+            throw new RequestFailure(
+                "unsupported",
+                "This language has no program-counter register to seed emulation"
+            );
+        }
+        Register stack = emulator.getStackPointerRegister();
+        Address sentinel = null;
+        if (stack != null && !seedsStackRegister(seeds, stack)) {
+            Address scratch = emulationStackAddress();
+            if (scratch == null) {
+                limitations.add(
+                    "No unmapped scratch region was found for a return sentinel; seed the stack register explicitly to observe a returned outcome."
+                );
+            }
+            else {
+                int width = Math.min(8, Math.max(1, stack.getBitLength() / 8));
+                emulator.writeMemory(
+                    scratch,
+                    emulationAddressBytes(
+                        scratch.getOffset(),
+                        width,
+                        currentProgram.getLanguage().isBigEndian()
+                    )
+                );
+                emulator.writeRegister(stack, BigInteger.valueOf(scratch.getOffset()));
+                sentinel = scratch;
+                limitations.add(
+                    "The function ran with a synthetic stack pointer at " +
+                        canonicalAddress(scratch) +
+                        " and a sentinel return address. Calls that depend on caller-provided stack arguments fault unless those bytes are seeded."
+                );
+            }
+        }
+        for (Map.Entry<Register, BigInteger> seed : seeds.entrySet()) {
+            emulator.writeRegister(seed.getKey(), seed.getValue());
+        }
+        for (EmulationMemoryWrite write : writes) {
+            emulator.writeMemory(write.address(), write.bytes());
+        }
+        emulator.writeRegister(pc, BigInteger.valueOf(entry.getOffset()));
+        return sentinel;
+    }
+
+    private static boolean seedsStackRegister(
+            Map<Register, BigInteger> seeds,
+            Register stack) {
+        for (Register seed : seeds.keySet()) {
+            if (seed.equals(stack) ||
+                seed.equals(stack.getBaseRegister()) ||
+                seed.getBaseRegister().equals(stack.getBaseRegister())) return true;
+        }
+        return false;
+    }
+
+    private Address emulationStackAddress() {
+        AddressSpace space = currentProgram.getAddressFactory().getDefaultAddressSpace();
+        Address preferred = null;
+        try {
+            preferred = space.getAddress(0x7FFE0000L);
+        }
+        catch (RuntimeException unsupported) {
+            preferred = null;
+        }
+        if (preferred != null && !currentProgram.getMemory().contains(preferred))
+            return preferred;
+        List<MemoryBlock> blocks = new ArrayList<>();
+        for (MemoryBlock block : currentProgram.getMemory().getBlocks()) {
+            if (block.getStart().getAddressSpace().equals(space)) blocks.add(block);
+        }
+        blocks.sort(Comparator.comparingLong(block -> block.getStart().getOffset()));
+        long previousEnd = 0x10000L;
+        for (MemoryBlock block : blocks) {
+            long start = block.getStart().getOffset();
+            if (start - previousEnd >= EMULATION_STACK_RESERVE)
+                return space.getAddress(previousEnd + EMULATION_STACK_RESERVE / 2);
+            long end = block.getEnd().getOffset();
+            if (end >= previousEnd) {
+                if (end == Long.MAX_VALUE) return null;
+                previousEnd = end + 1;
+            }
+        }
+        return null;
+    }
+
+    private Map<Register, BigInteger> emulationRegisterSeeds(JsonObject registers) {
+        if (registers.size() > MAX_EMULATION_REGISTERS) {
+            throw new RequestFailure(
+                "invalid_request",
+                "At most " + MAX_EMULATION_REGISTERS + " seed registers are supported"
+            );
+        }
+        Map<Register, BigInteger> seeds = new LinkedHashMap<>();
+        for (Map.Entry<String, JsonElement> entry : registers.entrySet()) {
+            Register register = currentProgram.getLanguage().getRegister(entry.getKey());
+            if (register == null) {
+                throw new RequestFailure(
+                    "invalid_request",
+                    "Unknown register for this language: " + entry.getKey()
+                );
+            }
+            BigInteger value = emulationValue(entry.getValue(), "register " + entry.getKey());
+            if (value.bitLength() > register.getBitLength()) {
+                throw new RequestFailure(
+                    "invalid_request",
+                    "Value for register " + entry.getKey() + " exceeds " +
+                        register.getBitLength() + " bits"
+                );
+            }
+            seeds.put(register, value);
+        }
+        return seeds;
+    }
+
+    private static BigInteger emulationValue(JsonElement element, String name) {
+        if (element == null || !element.isJsonPrimitive() ||
+            !element.getAsJsonPrimitive().isString()) {
+            throw new RequestFailure(
+                "invalid_request",
+                name + " must be a 0x-prefixed hexadecimal string"
+            );
+        }
+        String text = element.getAsString();
+        if (!text.matches("0[xX][0-9a-fA-F]{1,32}")) {
+            throw new RequestFailure(
+                "invalid_request",
+                name + " must be a 0x-prefixed hexadecimal string of at most 128 bits"
+            );
+        }
+        return new BigInteger(text.substring(2), 16);
+    }
+
+    private List<EmulationMemoryWrite> emulationMemoryWrites(JsonArray entries) {
+        List<EmulationMemoryWrite> writes = new ArrayList<>();
+        int total = 0;
+        for (JsonElement element : entries) {
+            if (!element.isJsonObject()) {
+                throw new RequestFailure("invalid_request", "memory entries must be objects");
+            }
+            JsonObject entry = element.getAsJsonObject();
+            boolean hex = entry.has("hex") && !entry.get("hex").isJsonNull();
+            boolean text = entry.has("text") && !entry.get("text").isJsonNull();
+            if (hex == text) {
+                throw new RequestFailure(
+                    "invalid_request",
+                    "Each memory entry supplies exactly one of hex or text"
+                );
+            }
+            requireKeys(entry, hex
+                ? Set.of("address", "hex")
+                : Set.of("address", "text"));
+            Address address = parseReaAddress(requireString(entry, "address"));
+            byte[] bytes = hex
+                ? emulationBytes(entry.get("hex"))
+                : requireString(entry, "text").getBytes(StandardCharsets.UTF_8);
+            total += bytes.length;
+            if (total > MAX_EMULATION_MEMORY_BYTES) {
+                throw new RequestFailure(
+                    "invalid_request",
+                    "Seeded memory exceeds " + MAX_EMULATION_MEMORY_BYTES + " bytes"
+                );
+            }
+            writes.add(new EmulationMemoryWrite(address, bytes));
+        }
+        return writes;
+    }
+
+    private static byte[] emulationBytes(JsonElement element) {
+        if (element == null || !element.isJsonPrimitive() ||
+            !element.getAsJsonPrimitive().isString()) {
+            throw new RequestFailure("invalid_request", "memory hex must be a string");
+        }
+        String text = element.getAsString();
+        if (!text.matches("(?:[0-9a-fA-F]{2})*")) {
+            throw new RequestFailure(
+                "invalid_request",
+                "memory hex must contain hexadecimal byte pairs"
+            );
+        }
+        return java.util.HexFormat.of().parseHex(text);
+    }
+
+    private List<EmulationMemoryRead> emulationMemoryReads(JsonArray entries) {
+        List<EmulationMemoryRead> reads = new ArrayList<>();
+        int total = 0;
+        for (JsonElement element : entries) {
+            if (!element.isJsonObject()) {
+                throw new RequestFailure("invalid_request", "read_memory entries must be objects");
+            }
+            JsonObject entry = element.getAsJsonObject();
+            requireKeys(entry, Set.of("address", "length"));
+            Address address = parseReaAddress(requireString(entry, "address"));
+            int length = requireBoundedInteger(entry, "length", 1, MAX_EMULATION_READ_BYTES);
+            total += length;
+            if (total > MAX_EMULATION_MEMORY_BYTES) {
+                throw new RequestFailure(
+                    "invalid_request",
+                    "read_memory exceeds " + MAX_EMULATION_MEMORY_BYTES + " total bytes"
+                );
+            }
+            reads.add(new EmulationMemoryRead(address, length));
+        }
+        return reads;
+    }
+
+    private List<Register> emulationReturnRegisters(JsonArray entries) {
+        if (entries.size() > MAX_EMULATION_REGISTERS) {
+            throw new RequestFailure(
+                "invalid_request",
+                "At most " + MAX_EMULATION_REGISTERS + " return registers are supported"
+            );
+        }
+        List<Register> registers = new ArrayList<>();
+        for (JsonElement element : entries) {
+            if (!element.isJsonPrimitive() || !element.getAsJsonPrimitive().isString()) {
+                throw new RequestFailure(
+                    "invalid_request",
+                    "return_registers must contain register names"
+                );
+            }
+            Register register = currentProgram.getLanguage().getRegister(element.getAsString());
+            if (register == null) {
+                throw new RequestFailure(
+                    "invalid_request",
+                    "Unknown register for this language: " + element.getAsString()
+                );
+            }
+            if (registers.stream().noneMatch(existing -> existing.equals(register)))
+                registers.add(register);
+        }
+        return registers;
+    }
+
+    private Map<Register, BigInteger> emulationRegisterSnapshot(EmulatorHelper emulator) {
+        Map<Register, BigInteger> values = new HashMap<>();
+        for (Register register : emulationRegisters()) {
+            try {
+                values.put(register, emulator.readRegister(register));
+            }
+            catch (RuntimeException unavailable) {
+                // Unreadable registers stay absent rather than becoming zero.
+            }
+        }
+        return values;
+    }
+
+    private List<Register> emulationRegisters() {
+        List<Register> registers = new ArrayList<>();
+        for (Register register : currentProgram.getLanguage().getRegisters()) {
+            if (!register.equals(register.getBaseRegister())) continue;
+            int bits = register.getBitLength();
+            if (bits < 8 || bits > 128) continue;
+            registers.add(register);
+        }
+        return registers;
+    }
+
+    private List<Register> emulationChangedRegisters(
+            EmulatorHelper emulator,
+            Map<Register, BigInteger> before) {
+        List<Register> changed = new ArrayList<>();
+        for (Register register : emulationRegisters()) {
+            try {
+                BigInteger previous = before.get(register);
+                BigInteger value = emulator.readRegister(register);
+                if (previous == null || !previous.equals(value)) changed.add(register);
+            }
+            catch (RuntimeException unavailable) {
+                // A register that became unreadable is not a value change.
+            }
+        }
+        changed.sort(Comparator.comparing(Register::getName));
+        return changed;
+    }
+
+    private JsonObject requireEmulationObject(JsonObject params, String name) {
+        JsonElement value = params.get(name);
+        if (value == null || !value.isJsonObject()) {
+            throw new RequestFailure("invalid_request", name + " must be an object");
+        }
+        return value.getAsJsonObject();
+    }
+
+    private JsonArray requireEmulationArray(JsonObject params, String name) {
+        JsonElement value = params.get(name);
+        if (value == null || !value.isJsonArray()) {
+            throw new RequestFailure("invalid_request", name + " must be an array");
+        }
+        return value.getAsJsonArray();
+    }
+
+    private static byte[] emulationAddressBytes(long value, int width, boolean bigEndian) {
+        byte[] bytes = new byte[width];
+        for (int index = 0; index < width; index++) {
+            int shift = (bigEndian ? width - 1 - index : index) * 8;
+            bytes[index] = (byte) ((value >>> shift) & 0xffL);
+        }
+        return bytes;
+    }
+
+    private static String emulationHex(BigInteger value, int bits) {
+        if (value.signum() < 0) value = value.add(BigInteger.ONE.shiftLeft(bits));
+        return "0x" + value.toString(16);
+    }
+
+    private static final class EmulationMemoryWrite {
+        private final Address address;
+        private final byte[] bytes;
+
+        private EmulationMemoryWrite(Address address, byte[] bytes) {
+            this.address = address;
+            this.bytes = bytes;
+        }
+
+        private Address address() { return address; }
+        private byte[] bytes() { return bytes; }
+    }
+
+    private static final class EmulationMemoryRead {
+        private final Address address;
+        private final int length;
+
+        private EmulationMemoryRead(Address address, int length) {
+            this.address = address;
+            this.length = length;
+        }
+
+        private Address address() { return address; }
+        private int length() { return length; }
     }
 
     private JsonObject procedureReferences(JsonObject params) throws Exception {
