@@ -44,6 +44,13 @@ import {
 import { jsonValueSchema } from "../domain/jsonValue.js";
 import { residualUnknownSchema } from "../domain/residualUnknown.js";
 import { evidenceBundleSchema } from "../domain/evidenceBundle.js";
+import { evidenceChainResultSchema } from "../domain/evidenceChain.js";
+import { evidenceBundleComparisonResultSchema } from "../domain/evidenceBundleComparison.js";
+import { evidenceCoverageAuditResultSchema } from "../domain/evidenceCoverageAudit.js";
+import { environmentDiagnosisResultSchema } from "../domain/environmentDiagnosis.js";
+import { unknownImpactResultSchema } from "../domain/unknownImpact.js";
+import { sessionChartResultSchema } from "../domain/sessionChart.js";
+import { investigationReportResultSchema } from "../domain/investigationReport.js";
 
 import { processCaptureComparisonSchema } from "../domain/process/processComparison.js";
 import {
@@ -644,6 +651,17 @@ export const sessionOutputSchemas = {
       truthVerified: z.boolean(),
       unknown: residualUnknownSchema,
     }),
+  ),
+  explain_evidence_chain: lifecycleResultOf(evidenceChainResultSchema),
+  compare_evidence_bundles: lifecycleResultOf(
+    evidenceBundleComparisonResultSchema,
+  ),
+  audit_evidence_coverage: lifecycleResultOf(evidenceCoverageAuditResultSchema),
+  diagnose_environment: lifecycleResultOf(environmentDiagnosisResultSchema),
+  project_unknown_impact: lifecycleResultOf(unknownImpactResultSchema),
+  render_session_chart: lifecycleResultOf(sessionChartResultSchema),
+  export_investigation_report: lifecycleResultOf(
+    investigationReportResultSchema,
   ),
 } satisfies Readonly<Record<string, z.ZodObject>>;
 

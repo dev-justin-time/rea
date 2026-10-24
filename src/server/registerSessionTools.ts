@@ -28,6 +28,7 @@ import { registerCloseLifecycleTool } from "./registerCloseLifecycleTool.js";
 import { registerFunctionComparisonTool } from "./registerFunctionComparisonTool.js";
 import { registerInvestigationTools } from "./registerInvestigationTools.js";
 import { registerChartTool } from "./registerChartTool.js";
+import { registerInvestigationAuditTools } from "./registerInvestigationAuditTools.js";
 import { registerProcessComparisonTool } from "./registerProcessComparisonTool.js";
 import {
   registerEvidenceTools,
@@ -422,6 +423,10 @@ export const registerSessionTools = (
     options.artifactResources,
   );
   registerInvestigationTools(server, session);
+  registerInvestigationAuditTools(server, session, {
+    artifactResources: options.artifactResources,
+    environment: options.environment,
+  });
   registerChartTool(server);
   registerUnknownTools({ server, session });
   registerContextTools(server, session);

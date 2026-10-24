@@ -9,10 +9,14 @@ import {
 } from "./investigationExamples.js";
 
 /** Canonical examples for contracts whose required inputs have no defaults. */
+const EXAMPLE_EVIDENCE_ID = `ev_${"0".repeat(64)}`;
+
 export const TOOL_EXAMPLE_OVERRIDES: Readonly<
   Record<string, Readonly<Record<string, JsonValue>>>
 > = {
   ...UNKNOWN_CONTRACT_EXAMPLES,
+  explain_evidence_chain: { evidence_id: EXAMPLE_EVIDENCE_ID },
+  compare_evidence_bundles: { path: "/tmp/evidence.json" },
   ...INVESTIGATION_EXAMPLES,
   inspect_byte_entropy: { path: "/artifacts/firmware.bin" },
   goto_address: { address: "0x1000" },
