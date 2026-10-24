@@ -56,6 +56,6 @@ export const chartDescription = (
 ): string => {
   if (detail !== undefined && detail.trim().length > 0) return detail.trim();
   if (kind === "call_graph")
-    return `Directed call graph with ${pointCount} functions.`;
-  return `Chart with ${pointCount} plotted values.`;
+    return `Directed call graph with ${pointCount} ${pointCount === 1 ? "function" : "functions"}.`;
+  return `Chart with ${pointCount} plotted ${pointCount === 1 ? "value" : "values"}.`;
 };

@@ -10,7 +10,8 @@
  */
 import { spawnSync } from "node:child_process";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { loadChartRenderer } from "./lib/chart-renderer.mjs";
 
@@ -186,7 +187,11 @@ await writeFile(
   "utf8",
 );
 
-const bin = resolve("node_modules/hyperframes/bin/hyperframes.mjs");
+const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const bin = join(
+  repositoryRoot,
+  "node_modules/hyperframes/bin/hyperframes.mjs",
+);
 const run = (args) =>
   spawnSync(process.execPath, [bin, ...args], {
     cwd: project,
@@ -229,10 +234,17 @@ if (noRender) {
   process.exit(0);
 }
 
-const ffmpeg = spawnSync("ffmpeg", ["-version"], { stdio: "ignore" });
-if (ffmpeg.status !== 0) {
+const ffmpegReady =
+  spawnSync("ffmpeg", ["-version"], { stdio: "ignore" }).status === 0;
+const ffprobeReady =
+  spawnSync("ffprobe", ["-version"], { stdio: "ignore" }).status === 0;
+if (!ffmpegReady || !ffprobeReady) {
+  const missing = [
+    ffmpegReady ? undefined : "ffmpeg",
+    ffprobeReady ? undefined : "ffprobe",
+  ].filter((binary) => binary !== undefined);
   console.error(
-    "FFmpeg is required to render MP4. Install it, confirm `ffmpeg -version` works, then re-run.",
+    `MP4 rendering needs ${missing.join(" and ")} on PATH. Install it, confirm \`${missing[0]} -version\` works, then re-run.`,
   );
   process.exit(1);
 }

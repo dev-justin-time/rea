@@ -4,7 +4,7 @@ import {
   type RenderChartInput,
   type RenderedChart,
 } from "./chartSpec.js";
-import { CHART_THEME } from "./chartTheme.js";
+import { CHART_THEME, escapeXml } from "./chartTheme.js";
 import { renderBarChartBody } from "./renderBarChart.js";
 import { renderCallGraphChartBody } from "./renderCallGraphChart.js";
 import { renderLineChartBody } from "./renderLineChart.js";
@@ -35,8 +35,8 @@ const renderBody = (spec: ChartSpec): ChartBody => {
 };
 
 /** Standalone HTML page so a rendered chart opens, prints and embeds directly. */
-export const chartHtmlDocument = (svg: string): string =>
-  `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>REA chart</title>\n<style>\n  :root { color-scheme: light; background: ${CHART_THEME.page}; }\n  body { margin: 0; padding: 32px; background: ${CHART_THEME.page}; }\n  figure { margin: 0 auto; max-width: 1120px; }\n  svg { display: block; width: 100%; height: auto; }\n  @media print { body { padding: 0; } }\n</style>\n</head>\n<body>\n<figure>${svg}</figure>\n</body>\n</html>\n`;
+export const chartHtmlDocument = (svg: string, title = "REA chart"): string =>
+  `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${escapeXml(title)}</title>\n<style>\n  :root { color-scheme: light; background: ${CHART_THEME.page}; }\n  body { margin: 0; padding: 32px; background: ${CHART_THEME.page}; }\n  figure { margin: 0 auto; max-width: 1120px; }\n  svg { display: block; width: 100%; height: auto; }\n  @media print { body { padding: 0; } }\n</style>\n</head>\n<body>\n<figure>${svg}</figure>\n</body>\n</html>\n`;
 
 /** Validate and render one chart, returning markup and its measured canvas. */
 export const renderChart = (input: RenderChartInput): RenderedChart => {
@@ -60,6 +60,6 @@ export const renderChart = (input: RenderChartInput): RenderedChart => {
     width: rendered.width,
     height: rendered.height,
     title: spec.title,
-    content: input.format === "html" ? chartHtmlDocument(svg) : svg,
+    content: input.format === "html" ? chartHtmlDocument(svg, spec.title) : svg,
   };
 };

@@ -239,6 +239,54 @@ For provider selection, see the [CLI guide](docs/cli.md#choose-a-provider).
 Check [release availability](docs/installation.md#released-package-and-main)
 for features added since the latest npm release.
 
+## Charts, emulation and session search
+
+Three capabilities extend the dossier without leaving the same MCP session.
+
+**Charts.** `render_native_chart` turns observed values into one flat,
+accessible figure: ordered bar magnitudes, multi-series lines, or an explicit
+call graph. It returns self-contained SVG (or a standalone HTML page) with a
+title, description, `role="img"`, escaped text and no shadows, filters or
+third-party runtime. The chart is presentation only: it adds no observations and
+records no Evidence. Inputs are validated (unique labels, one value per x label,
+real edge endpoints) and capped at 64 categories, 4 line series, 128 nodes and
+512 edges.
+
+**Call-graph charts without another provider call.** `get_call_graph` accepts
+`render: "svg" | "html"` and projects the graph REA already traversed into the
+same layered layout. Graphs above the chart caps keep the complete graph in
+`graph` and report what the chart omitted in `limitations`; a dashed edge returns
+to an earlier column.
+
+**Website figures.** `npm run chart:figure -- spec.json --out public/assets/figures/name.svg`
+renders a committed figure with the same renderer after `npm run compile`.
+`python3 scripts/website.py check` rejects a published figure without a `viewBox`
+or non-empty `<title>`, and any that adds a filter or shadow. See
+[charts, figures and videos](docs/charts-and-video.md) for the JSON specification.
+
+**Videos.** `npm run chart:video -- spec.json --out .cache/chart-video` wraps the
+same SVG in a 1920×1080 HyperFrames composition, animates the chart primitives on
+a paused GSAP timeline, runs `hyperframes check`, and renders MP4. Options:
+`--duration <3-30>`, `--quality draft|looks|delivery` and `--no-render`. Rendering
+needs a Chrome-family browser, `ffmpeg` and `ffprobe`; the first run also fetches
+GSAP from its CDN.
+
+**Function emulation.** `emulate_native_function` runs one analyzed procedure in
+Ghidra's isolated p-code emulator with caller-supplied registers and memory,
+bounded by `max_steps`. It returns the stop outcome (`returned`, `step_limit` or
+`fault`), the final PC, requested or changed registers and requested memory
+bytes. It never executes the target process, emulates OS APIs, seeds stack
+arguments automatically or proves native equivalence; other providers report the
+operation unsupported. See [native emulation](docs/native-emulation.md).
+
+**Retained-Evidence search.** `search_evidence` ranks Evidence already retained
+in the session by a deterministic lexical score, so a long investigation can be
+queried without transferring the complete bundle. It shares the bundle filters,
+returns compact hits with matched terms and snippets, and stops after 5,000
+records or 64 Mi characters while reporting the truncation. It reads retained
+observations only: it never queries a provider and records no Evidence. Feed a
+returned `evidence_id` to `inspect_analysis_view` or `get_evidence_bundle`.
+
 ## Showcases
 
 <a href="https://rea.tools/showcase/">
@@ -366,7 +414,9 @@ For exact options, prerequisites and result contracts:
 - [Installation and setup](docs/installation.md): agent registration, provider configuration, updates and uninstall.
 - [Readiness and troubleshooting](docs/installation.md#check-readiness-for-your-task): diagnose one agent or analysis engine.
 - [CLI and Evidence](docs/cli.md): commands, provider selection, snapshots, import/export and exit statuses.
-- [MCP contracts](docs/mcp-contracts.md) and [agent prompts](docs/mcp-prompts.md): tool results, sessions and guided investigations.
+- [Charts, figures and videos](docs/charts-and-video.md): chart specifications, the `render_native_chart` tool, interactive call-graph charts, website figures and MP4 export.
+- [Native function emulation](docs/native-emulation.md): seeding Ghidra's p-code emulator, reading its outcome and limits.
+- [MCP contracts](docs/mcp-contracts.md) and [agent prompts](docs/mcp-prompts.md): tool results, sessions, retained-Evidence search and guided investigations.
 - [Tool catalog](docs/mcp-contracts.md#generated-catalog): generated inventory of tools, providers and CLI commands.
 - [Roadmap](docs/roadmap.md): planned work and capability trackers.
 

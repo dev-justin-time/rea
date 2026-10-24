@@ -14,7 +14,8 @@ const NODE_HEIGHT = 42;
 const GAP_Y = 18;
 const GAP_X = 96;
 const NODE_STROKE = "#c3ccd4";
-const MAX_DEPTH = 12;
+/** Matches the specification's `depth` maximum so no declared column collapses. */
+const MAX_DEPTH = 32;
 
 interface Placement {
   readonly x: number;
@@ -62,9 +63,12 @@ const assignDepths = (
   const roots = spec.nodes
     .filter((node) => (incoming.get(node.id) ?? 0) === 0)
     .map((node) => node.id);
-  const queue = roots.length > 0 ? roots : [spec.nodes[0]?.id ?? ""];
-  for (const root of queue)
-    if (root.length > 0 && !depths.has(root)) depths.set(root, 0);
+  // Explicitly placed nodes also seed the walk so their own callees keep a
+  // depth relative to them instead of falling back to column 0.
+  const queue = [...new Set([...roots, ...depths.keys()])];
+  if (queue.length === 0) queue.push(spec.nodes[0]?.id ?? "");
+  for (const seed of queue)
+    if (seed.length > 0 && !depths.has(seed)) depths.set(seed, 0);
   for (let index = 0; index < queue.length; index += 1) {
     const current = queue[index];
     if (current === undefined) continue;
@@ -80,7 +84,7 @@ const assignDepths = (
   return depths;
 };
 
-/** Group node ids into depth columns, preserving the declared order. */
+/** Group node ids into depth columns, sorted by id for a stable layout. */
 const columnGroups = (
   spec: CallGraphChartSpec,
   depths: ReadonlyMap<string, number>,

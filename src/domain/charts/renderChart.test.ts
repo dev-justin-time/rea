@@ -167,6 +167,30 @@ describe("call graph chart", () => {
     });
     expect(chart.content.match(/width="210"/g)).toHaveLength(2);
   });
+
+  it("keeps callees of an explicitly placed node one column to its right", () => {
+    const chart = renderChart({
+      chart: {
+        kind: "call_graph",
+        title: "Partial depths",
+        nodes: [
+          { id: "root", label: "root" },
+          { id: "middle", label: "middle", depth: 2 },
+          { id: "leaf", label: "leaf" },
+        ],
+        edges: [
+          { source: "root", target: "middle" },
+          { source: "middle", target: "leaf" },
+        ],
+      },
+      format: "svg",
+    });
+    const columns = [
+      ...chart.content.matchAll(/<rect class="chart-node" x="([\d.]+)"/g),
+    ].map((match) => Number(match[1]));
+    expect(new Set(columns).size).toBe(3);
+    expect(Math.max(...columns)).toBeGreaterThan(columns[0] ?? 0);
+  });
 });
 
 describe("HTML delivery", () => {
@@ -178,5 +202,10 @@ describe("HTML delivery", () => {
       '<figure><svg xmlns="http://www.w3.org/2000/svg"',
     );
     expect(chartHtmlDocument("<svg/>")).toContain("<figure><svg/></figure>");
+  });
+
+  it("titles the standalone page after the chart", () => {
+    const chart = renderChart({ chart: bar, format: "html" });
+    expect(chart.content).toContain(`<title>${bar.title}</title>`);
   });
 });

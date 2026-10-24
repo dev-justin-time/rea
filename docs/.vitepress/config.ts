@@ -28,6 +28,8 @@ export default defineConfig({
         text: "Investigation guides",
         items: [
           { text: "Native binaries", link: "/native-investigation" },
+          { text: "Native function emulation", link: "/native-emulation" },
+          { text: "Charts, figures and videos", link: "/charts-and-video" },
           { text: "Go build metadata", link: "/go-binaries" },
           { text: "IL2CPP metadata", link: "/il2cpp-metadata" },
           { text: "Model artifacts", link: "/model-artifacts" },

@@ -200,10 +200,13 @@ describe("server and catalog identity", () => {
     });
     expect(unknown.alignment.state).toBe("unknown");
     expect(unknown.server.command_path).toBeNull();
+    // Compare against the platform's absolute form, as the runtime reports it.
+    const packagedPath = normalizeEntrypointPath("/packaged/rea.mjs");
+    if (packagedPath === undefined) throw new Error("expected a path");
     const aligned = createServerIdentity({
       catalog: DEFAULT_CATALOG_IDENTITY,
       startedAt: "2026-07-13T00:00:00.000Z",
-      commandPath: "/packaged/rea.mjs",
+      commandPath: packagedPath,
       expected: {
         package_version: PRODUCT_IDENTITY.packageVersion,
         catalog_digest: DEFAULT_CATALOG_IDENTITY.digests.combined_sha256,

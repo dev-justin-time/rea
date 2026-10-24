@@ -32,8 +32,9 @@ embedded in the analysis pipeline.
 | [mattpocock/skills](https://github.com/mattpocock/skills)                                             | MIT                                                 | Agent engineering workflows (grilling, TDD, bug diagnosis, architecture review, spec/ticket flow). These are agent instructions, not runtime features.                                                                      | Not vendored; install per-agent (`npx skills add mattpocock/skills`) alongside `.agents/skills/reverse-engineer-anything/` | Documented, not embedded                |
 | [mksglu/context-mode](https://github.com/mksglu/context-mode)                                         | Elastic License 2.0 (source-available, **not** OSI) | MCP server that keeps raw tool output out of the model context, indexes session events in SQLite/FTS5, and retrieves only relevant slices. ELv2 forbids copying it into this MIT project, so only the _pattern_ is adopted. | `src/domain/evidenceSearch.ts`, `src/application/investigation/SearchEvidence.ts`, session tool `search_evidence`          | Pattern integrated                      |
 | [ranxianglei/billion-context-pi](https://github.com/ranxianglei/billion-context-pi)                   | MIT                                                 | Pi-host extension for model-driven, multi-tier context compression plus `search_context` over compressed blocks. Pi-specific event interception has no equivalent in an MCP server, so only its retrieval model is used.    | `src/domain/evidenceSearch.ts` (bounded search over retained observations)                                                 | Pattern integrated                      |
-| [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design)                       | MIT                                                 | Editorial diagram rules: flat surfaces, no shadows or filters, restrained palette, real text, self-contained HTML/SVG. REA adopts the rules and its own renderer; no skill assets are vendored.                             | `src/domain/charts/`, `scripts/render-chart-figure.mjs`, `website/figures.md`                                              | Rules + tooling integrated              |     | [heygen-com/hyperframes](https://github.com/heygen-com/hyperframes) | Apache-2.0 | HTML/CSS + seekable GSAP → deterministic MP4. Dev dependency (`0.8.190` in the lockfile) behind the opt-in chart-video export; rendering needs Chrome and FFmpeg. | `scripts/render-chart-video.mjs`, `package.json` | Integrated (opt-in render) |
-| [heygen-com/hyperframes-community-skills](https://github.com/heygen-com/hyperframes-community-skills) | Apache-2.0                                          | Community HyperFrames workflows (explainers, captions, paint animation). Agent instructions for video production, not runtime chart code.                                                                                   | Not vendored; install per-agent with `npx skills add heygen-com/hyperframes`                                               | Documented, not embedded                |
+| [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design)                       | MIT                                                 | Editorial diagram rules: flat surfaces, no shadows or filters, restrained palette, real text, self-contained HTML/SVG. REA adopts the rules and its own renderer; no skill assets are vendored.                             | `src/domain/charts/`, `scripts/render-chart-figure.mjs`, `website/figures.md`                                              | Rules + tooling integrated              |
+| [heygen-com/hyperframes](https://github.com/heygen-com/hyperframes)                                   | Apache-2.0                                          | HTML/CSS + seekable GSAP → deterministic MP4. Dev dependency (`0.8.190` in the lockfile) behind the opt-in chart-video export; rendering needs Chrome, FFmpeg and ffprobe.                                                  | `scripts/render-chart-video.mjs`, `package.json`                                                                           | Integrated (opt-in render)              |
+| [heygen-com/hyperframes-community-skills](https://github.com/heygen-com/hyperframes-community-skills) | Apache-2.0                                          | Community HyperFrames workflows (explainers, captions, paint animation). Agent instructions for video production, not runtime chart code.                                                                                   | Not vendored; install per-agent with `npx skills add heygen-com/hyperframes-community-skills`                              | Documented, not embedded                |
 | [heygen-com/liveavatar-gpt-live-demos](https://github.com/heygen-com/liveavatar-gpt-live-demos)       | MIT                                                 | Real-time LiveAvatar + GPT demos. Contains no chart, diagram or rendering code.                                                                                                                                             | Not applicable                                                                                                             | Not integrated                          |
 | [heygen-com/liveavatar-sales-agent](https://github.com/heygen-com/liveavatar-sales-agent)             | MIT                                                 | Next.js talking-head sales agent with LiveAvatar, Anthropic and CRM integrations. No charting surface to upgrade.                                                                                                           | Not applicable                                                                                                             | Not integrated                          |
 
@@ -125,8 +126,10 @@ Charts are one shared renderer, not three implementations:
 - `scripts/render-chart-video.mjs` wraps the same SVG in a 1920×1080
   HyperFrames composition, animates `.chart-bar`, `.chart-line`, `.chart-dot`
   or `.chart-node` with a paused GSAP timeline, runs `hyperframes check`, then
-  renders MP4 when FFmpeg is available. The checked composition and a 6.0s MP4
+  renders MP4 when FFmpeg and ffprobe are available. The checked composition and a 6.0s MP4
   were produced locally; the frame was inspected.
+- Guides: [charts, figures and videos](docs/charts-and-video.md) and
+  [native function emulation](docs/native-emulation.md).
 
 ## Deliberately not integrated
 
@@ -155,7 +158,7 @@ Charts are one shared renderer, not three implementations:
 - Real headless bridge session — inventory + emulation exercised over the
   authenticated loopback transport.
 - `vitest run src/domain/charts src/application/native/CallGraphChart.test.ts` —
-  14 tests pass (validation, escaping, layout, caps, HTML delivery).
+  16 tests pass (validation, escaping, layout, caps, HTML delivery).
 - `npx tsc -p tsconfig.build.json` — the chart core and both scripts build and run.
 - HyperFrames `check` on a generated call-graph composition — `ok: true`, zero
   lint and runtime findings; `render --quality draft` produced a 6.0s, 71 KB MP4.
@@ -172,7 +175,8 @@ Charts are one shared renderer, not three implementations:
   SVG was ignored. The full `python3 scripts/website.py check` was not run
   because the website Python environment cannot be installed here (CairoSVG is
   unavailable on this host).
-- Unrelated baseline failures still occur on this host: the `toolEffects`
-  destructive-list assertion, a self-contained `toolInputReferences` case, and
-  three Windows file-lock tests under `src/server`. Reproducible without these
-  changes.
+- `vitest run src/contracts` — 181 tests pass, including the destructive-effect
+  audit and the advertised-default composition case that previously failed.
+- `vitest run src/server` still has 4 host-specific failures: two bundle
+  asset-catalog checks and two Windows state-file locking checks. None touches
+  the chart, CLI or contract paths changed here.

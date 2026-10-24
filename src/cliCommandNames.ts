@@ -256,6 +256,11 @@ export const MCP_TOOLS_WITHOUT_DEDICATED_CLI = Object.freeze([
   "update_unknown",
   "verify_unknown_resolution",
   "get_evidence_bundle",
+  // These read or present state that only exists inside one MCP session:
+  // retained Evidence, a live emulator, or a rendered presentation.
+  "search_evidence",
+  "render_native_chart",
+  "emulate_native_function",
   "get_navigation_context",
   "inspect_address_context",
   "start_gdb_session",

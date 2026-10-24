@@ -556,6 +556,27 @@ JSON to a file and use `inspect-analysis-view` with inline source Evidence for
 later inventory summaries or pages; a one-shot CLI session cannot retain a
 parent for another invocation.
 
+### Searching retained Evidence
+
+`search_evidence` queries the connection's retained ledger without transferring
+the complete bundle. It takes `query` (1-512 characters), `limit` (1-50,
+default 10) and the same optional `filters` object as `get_evidence_bundle`
+(evidence ID, operation, target SHA-256, analysis-profile digest and canonical
+native procedure address).
+
+Ranking is a deterministic BM25-style lexical score over each record's canonical
+payload text; it is retrieval, not semantic search and not a claim that a match
+is relevant to target behavior. Ties break by Evidence ID in Unicode code-point
+order. Each hit contains `evidence_id`, `operation`, `target_sha256`,
+`analysis_profile_digest`, `score`, `matched_terms` and a short `snippet`.
+`total_matches` and `scanned_records` report the matched and examined counts, and
+`limitations` names truncation. Search stops after 5,000 records or 64 Mi
+characters and reports the first limit it reached.
+
+The tool reads only retained observations: it starts no provider, records no
+Evidence and does not modify the ledger. Pass a returned `evidence_id` to
+`inspect_analysis_view` or `get_evidence_bundle` to read the complete record.
+
 ## Identity and discovery
 
 `binary_session` reports the active package, server, SDK, and negotiated

@@ -142,8 +142,23 @@ const sharedRequiredProperties = (
   return first.filter((name) => others.every((names) => names.includes(name)));
 };
 
+/** A declared default makes a required JSON Schema property optional to callers. */
+const hasDefault = (
+  branch: Readonly<Record<string, unknown>>,
+  name: string,
+): boolean => {
+  const properties = branch.properties;
+  const property = isObject(properties) ? properties[name] : undefined;
+  return isObject(property) && Object.hasOwn(property, "default");
+};
+
+const requiredWithoutDefaults = (
+  branch: Readonly<Record<string, unknown>>,
+): readonly string[] =>
+  requiredProperties(branch).filter((name) => !hasDefault(branch, name));
+
 const inputGroup = (branch: Readonly<Record<string, unknown>>): string => {
-  const required = requiredProperties(branch);
+  const required = requiredWithoutDefaults(branch);
   const optional = Object.keys(branch.properties ?? {})
     .filter((name) => !required.includes(name))
     .map((name) => `[${name}]`);
@@ -396,7 +411,11 @@ const flattenRootObjectUnion = (
         known.push(schema);
       variants.set(name, known);
     }
-  const required = sharedRequiredProperties(branches);
+  // A default satisfies its property without caller input, so a lifted schema
+  // must not require it; the canonical parser applies that same default.
+  const required = sharedRequiredProperties(branches).filter((name) =>
+    branches.some((branch) => !hasDefault(branch, name)),
+  );
   // A default lifted out of an input group can make a client send a field
   // rejected by another strict group. Keep it only when every group owns the
   // property and supplies the same default.
@@ -432,7 +451,7 @@ const flattenRootObjectUnion = (
   // A coarse property minimum rejects underspecified objects. Partner fields
   // and exact group membership remain enforced by the canonical runtime parser.
   const fewestRequired = Math.min(
-    ...branches.map((branch) => requiredProperties(branch).length),
+    ...branches.map((branch) => requiredWithoutDefaults(branch).length),
   );
   // Groups that differ only in property values add no caller guidance.
   const groups = [...new Set(branches.map(inputGroup))];
