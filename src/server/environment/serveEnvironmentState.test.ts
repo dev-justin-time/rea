@@ -42,6 +42,7 @@ import {
 import { createTestTempDirectory } from "../../../tests/fixtures/temporaryDirectory.js";
 import { EnvironmentStateStore } from "../../application/environment/environmentStateStore.js";
 import { ArtifactResourceRetryFailure } from "../../artifacts/ArtifactResourceScope.js";
+import { AnalysisOutputError } from "../../domain/analysisErrorCore.js";
 import { OwnedFileHandle } from "../../filesystem/OwnedFileHandle.js";
 import {
   environmentCard,
@@ -142,6 +143,19 @@ const failFirstFileClose = (failing: () => boolean = () => true) => {
     for (const owner of owners) if (owner.handle.fd >= 0) await owner.close();
   });
   return owners;
+};
+
+/**
+ * The typed failure `close()` reports, past the environment-shutdown wrapper
+ * that attributes the failed stages and retains the shutdown owners.
+ */
+const closeCause = async (environment: ServedEnvironment): Promise<unknown> => {
+  const failure = await environment.close().then(
+    () => undefined,
+    (cause: unknown) => cause,
+  );
+  expect(failure).toBeInstanceOf(AnalysisOutputError);
+  return failure instanceof AnalysisOutputError ? failure.cause : undefined;
 };
 
 /** A `data/add` message loading the document an https uri names. */
@@ -957,7 +971,7 @@ describe("serveEnvironment with a state", () => {
     await expect(
       add({ kind: "data", data: renamedDocument() }),
     ).resolves.toMatchObject({ result: {} });
-    await expect(environment.close()).rejects.toBeInstanceOf(
+    await expect(closeCause(environment)).resolves.toBeInstanceOf(
       ArtifactResourceRetryFailure,
     );
     expect(owners[0]?.handle.fd).toBeGreaterThanOrEqual(0);
@@ -990,13 +1004,12 @@ describe("serveEnvironment cleanup retries", () => {
 
     const listenerFailure = new Error("injected listener cleanup failure");
     closeFailureControl.failure = listenerFailure;
-    await expect(environment.close()).rejects.toSatisfy((cause: unknown) => {
-      if (!(cause instanceof AggregateError)) return false;
-      return (
-        cause.errors[0] === listenerFailure &&
-        cause.errors[1] instanceof ArtifactResourceRetryFailure
-      );
-    });
+    const cause = await closeCause(environment);
+    expect(cause).toBeInstanceOf(AggregateError);
+    if (!(cause instanceof AggregateError))
+      throw new Error("Expected both cleanup stages to be reported");
+    expect(cause.errors[0]).toBe(listenerFailure);
+    expect(cause.errors[1]).toBeInstanceOf(ArtifactResourceRetryFailure);
     expect(owners[0]?.handle.fd).toBeGreaterThanOrEqual(0);
 
     failing = false;

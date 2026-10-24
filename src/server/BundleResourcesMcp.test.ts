@@ -2,7 +2,7 @@ import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import type { AnySchema } from "ajv";
 import { afterEach, expect, it } from "vitest";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { z } from "zod";
@@ -29,6 +29,20 @@ const identity: ProviderIdentity = {
   version: "1",
 };
 
+/** Error results carry text only, so read the projected error from its JSON text. */
+const errorOf = (result: {
+  readonly content?: readonly unknown[];
+}): unknown => {
+  const block = result.content?.[0];
+  const text =
+    typeof block === "object" && block !== null && "text" in block
+      ? (block as { readonly text: unknown }).text
+      : undefined;
+  if (typeof text !== "string")
+    throw new Error("The failed tool result carries no text");
+  return JSON.parse(text) as unknown;
+};
+
 const resources: Array<{ close(): Promise<unknown> }> = [];
 
 afterEach(async () => {
@@ -41,6 +55,7 @@ it("routes bundle resource MCP calls with null executable identity and retained 
   await mkdir(bundle);
   const plistPath = join(bundle, "Info.plist");
   await writeFile(plistPath, '<?xml version="1.0"?><plist><dict/></plist>');
+  const canonicalBundle = await realpath(bundle);
 
   const resourceClient: AnalysisClient = {
     execute: async (operation) => {
@@ -105,7 +120,7 @@ it("routes bundle resource MCP calls with null executable identity and retained 
     arguments: { path: plistPath },
   });
   expect(unbound.isError).toBe(true);
-  expect(unbound.structuredContent).toMatchObject({
+  expect(errorOf(unbound)).toMatchObject({
     error: { code: "target_unavailable", category: "unavailable" },
   });
   const unopened = await client.callTool({
@@ -119,13 +134,15 @@ it("routes bundle resource MCP calls with null executable identity and retained 
   ).toMatchObject({
     result: {
       open: false,
-      tool_availability: expect.arrayContaining([
-        expect.objectContaining({
-          name: "inspect_plist",
-          available: false,
-          reason: "target_required",
-        }),
-      ]),
+      tool_availability: {
+        groups: expect.arrayContaining([
+          expect.objectContaining({
+            names: expect.arrayContaining(["inspect_plist"]),
+            available: false,
+            reason: "target_required",
+          }),
+        ]),
+      },
     },
   });
 
@@ -140,7 +157,7 @@ it("routes bundle resource MCP calls with null executable identity and retained 
     ),
   ).toMatchObject({
     result: {
-      canonical_path: bundle,
+      canonical_path: canonicalBundle,
       executable_sha256: null,
     },
   });
@@ -156,7 +173,10 @@ it("routes bundle resource MCP calls with null executable identity and retained 
     result: {
       open: true,
       session_kind: "bundle_resources",
-      resource_root: { canonical_path: bundle, executable_sha256: null },
+      resource_root: {
+        canonical_path: canonicalBundle,
+        executable_sha256: null,
+      },
     },
   });
 
@@ -182,6 +202,7 @@ it("routes bundle resource MCP calls with null executable identity and retained 
     subject: null,
     operation: "inspect_plist",
     normalized_result: {
+      // Retained Evidence keeps the provider-reported root verbatim.
       resource_root: { canonical_path: bundle, executable_sha256: null },
     },
   });
@@ -224,6 +245,8 @@ it("exposes the production resource session through the MCP SDK for a keyless bu
   await server.connect(serverTransport);
   await client.connect(clientTransport);
 
+  // The reported canonical path is resolved; the caller path stays as supplied.
+  const canonicalBundle = await realpath(bundle);
   const opened = await client.callTool({
     name: "open_bundle_resources",
     arguments: { path: bundle },
@@ -234,7 +257,7 @@ it("exposes the production resource session through the MCP SDK for a keyless bu
       opened.structuredContent,
     ),
   ).toMatchObject({
-    result: { canonical_path: bundle, executable_sha256: null },
+    result: { canonical_path: canonicalBundle, executable_sha256: null },
   });
 
   const decoded = await client.callTool({
@@ -249,7 +272,10 @@ it("exposes the production resource session through the MCP SDK for a keyless bu
     subject: null,
     normalized_result: {
       target_sha256: null,
-      resource_root: { canonical_path: bundle, executable_sha256: null },
+      resource_root: {
+        canonical_path: canonicalBundle,
+        executable_sha256: null,
+      },
     },
   });
   const decodedEvidenceId = z
@@ -278,10 +304,10 @@ it("exposes the production resource session through the MCP SDK for a keyless bu
       ),
     ).toMatchObject({
       normalized_result: {
-        artifact: { path: bundle, sha256: null },
+        artifact: { path: canonicalBundle, sha256: null },
         resource_root: {
           caller_path: bundle,
-          canonical_path: bundle,
+          canonical_path: canonicalBundle,
           executable_sha256: null,
         },
       },
@@ -301,7 +327,10 @@ it("exposes the production resource session through the MCP SDK for a keyless bu
     normalized_result: {
       archive_path: "Resources/Archive.plist",
       target_sha256: null,
-      resource_root: { canonical_path: bundle, executable_sha256: null },
+      resource_root: {
+        canonical_path: canonicalBundle,
+        executable_sha256: null,
+      },
       objects: expect.arrayContaining([
         expect.objectContaining({ value: "resource-only-value" }),
       ]),
@@ -314,7 +343,10 @@ it("exposes the production resource session through the MCP SDK for a keyless bu
     subject: null,
     operation: "inspect_keyed_archive",
     normalized_result: {
-      resource_root: { canonical_path: bundle, executable_sha256: null },
+      resource_root: {
+        canonical_path: canonicalBundle,
+        executable_sha256: null,
+      },
     },
   });
 });
@@ -347,6 +379,15 @@ const expectResourceSchemaBranches = async (client: Client): Promise<void> => {
       name: "inspect_asset_catalog",
       validResult: jsonObjectSchema.parse({
         target_sha256: "a".repeat(64),
+        inventory_coverage: { scope: "container-entries", status: "unknown" },
+        catalog_coverage: {
+          status: "unknown",
+          reason: "catalog_coverage_not_reported",
+        },
+        resource_key_coverage: {
+          status: "unknown",
+          reason: "resource_key_coverage_not_reported",
+        },
         catalogs: [],
         total_records: 0,
         offset: 0,
