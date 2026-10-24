@@ -58,6 +58,7 @@ export const TOOL_EXAMPLE_OVERRIDES: Readonly<
   open_binary: { path: "/tmp/fixture" },
   open_bundle_resources: { path: "/tmp/Fixture.app" },
   export_evidence_bundle: { path: "/tmp/evidence.json" },
+  search_evidence: { query: "authorization", limit: 5 },
   get_evidence_bundle: {
     detail: "summary",
     filters: { operation: "analyze_function", procedure_address: "0x1000" },

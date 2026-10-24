@@ -114,6 +114,29 @@ const nativeSummary = (
   };
 };
 
+/** Exact retained-record selector shared by discovery and content search. */
+export const evidenceMatchesFilters = (
+  evidence: Evidence,
+  filters: EvidenceRecordFilters = {},
+): boolean => {
+  if (
+    (filters.evidence_id !== undefined &&
+      filters.evidence_id !== evidence.evidence_id) ||
+    (filters.operation !== undefined &&
+      filters.operation !== evidence.operation) ||
+    (filters.target_sha256 !== undefined &&
+      filters.target_sha256 !== evidence.subject?.digest.sha256) ||
+    (filters.analysis_profile_digest !== undefined &&
+      filters.analysis_profile_digest !== evidence.analysis_profile?.digest)
+  )
+    return false;
+  if (filters.procedure_address === undefined) return true;
+  const native = nativeSummary(evidence);
+  return (
+    native.available && filters.procedure_address === native.procedure_address
+  );
+};
+
 /** Discover retained Evidence without reading or copying its complete payloads. */
 export const summarizeEvidenceBundle = (
   bundle: EvidenceBundle,
@@ -124,24 +147,8 @@ export const summarizeEvidenceBundle = (
     if (value !== undefined) selectedFilters[field] = value;
   const records: EvidenceBundleSummary["records"] = [];
   for (const evidence of bundle.records) {
-    if (
-      (filters.evidence_id !== undefined &&
-        filters.evidence_id !== evidence.evidence_id) ||
-      (filters.operation !== undefined &&
-        filters.operation !== evidence.operation) ||
-      (filters.target_sha256 !== undefined &&
-        filters.target_sha256 !== evidence.subject?.digest.sha256) ||
-      (filters.analysis_profile_digest !== undefined &&
-        filters.analysis_profile_digest !== evidence.analysis_profile?.digest)
-    )
-      continue;
+    if (!evidenceMatchesFilters(evidence, filters)) continue;
     const native = nativeSummary(evidence);
-    if (
-      filters.procedure_address !== undefined &&
-      (!native.available ||
-        filters.procedure_address !== native.procedure_address)
-    )
-      continue;
     records.push({
       evidence_id: evidence.evidence_id,
       subject: evidence.subject,

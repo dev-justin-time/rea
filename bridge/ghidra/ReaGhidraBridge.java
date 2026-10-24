@@ -1521,7 +1521,8 @@ public final class ReaGhidraBridge extends HeadlessScript {
     private List<Register> emulationRegisters() {
         List<Register> registers = new ArrayList<>();
         for (Register register : currentProgram.getLanguage().getRegisters()) {
-            if (!register.equals(register.getBaseRegister())) continue;
+            if (!register.isBaseRegister() || register.isProcessorContext() ||
+                register.isHidden()) continue;
             int bits = register.getBitLength();
             if (bits < 8 || bits > 128) continue;
             registers.add(register);

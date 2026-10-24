@@ -34,6 +34,7 @@ import { nativeValueTraceSchema } from "../domain/native/nativeValueTrace.js";
 import { bundleResourceRootSchema } from "../domain/apple/bundleResourceRoot.js";
 import { nativeDataTypeSchema } from "../domain/native/nativeDataType.js";
 import { nativeEmulationSchema } from "../domain/native/nativeEmulation.js";
+import { evidenceSearchResultSchema } from "../domain/evidenceSearch.js";
 import { nativeCallObservationResultSchema } from "../domain/native/nativeCallObservation.js";
 import {
   nativeInstructionSchema,
@@ -579,6 +580,7 @@ export const sessionOutputSchemas = {
   get_evidence_bundle: lifecycleResultOf(
     z.union([evidenceBundleSchema, evidenceBundleSummarySchema]),
   ),
+  search_evidence: lifecycleResultOf(evidenceSearchResultSchema),
   get_navigation_context: lifecycleResultOf(
     z.object({
       document: z.string(),
