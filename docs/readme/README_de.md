@@ -193,6 +193,8 @@ Bei großen Binärdateien kannst du die Startfrist mit `REA_GHIDRA_STARTUP_TIMEO
 
 Native Formate und unterstützte Hostsysteme unterscheiden sich je nach Provider. Siehe [Hopper- und Ghidra-Einrichtung](../installation.md#hopper), den [IDA-Leitfaden](../ida-provider.md), [Kuna](../kuna-provider.md) und die [experimentelle Ghidra-Unterstützung unter Windows](../windows-ghidra-p0.md). Ghidra unterstützt auch [16-Bit-DOS-Analyse](../ghidra-dos.md). Die Provider-Auswahl beschreibt der [CLI-Leitfaden](../cli.md#choose-a-provider). Prüfe die [Verfügbarkeit in Releases](../installation.md#released-package-and-main) für Funktionen, die seit der neuesten npm-Version hinzugekommen sind.
 
+Um Abbildungen und Videos zu erstellen, siehe [Diagramme, Abbildungen und Videos](../charts-and-video.md); um eine Funktion im p-code-Emulator von Ghidra auszuführen, siehe [Emulation nativer Funktionen](../native-emulation.md).
+
 ## Fallstudien
 
 <a href="https://rea.tools/de/showcase/">
@@ -294,6 +296,8 @@ Beginne mit den [praxisnahen Anleitungen](https://rea.tools/de/guides/) auf der 
 - [Installation und Einrichtung](../installation.md): Agentenregistrierung, Provider-Konfiguration, Updates und Deinstallation.
 - [Bereitschaft und Fehlerbehebung](../installation.md#check-readiness-for-your-task): Diagnose eines bestimmten Agenten oder einer Analyse-Engine.
 - [CLI und Evidence](../cli.md): Befehle, Provider-Auswahl, Snapshots, Import/Export und Exit-Status.
+- [Diagramme, Abbildungen und Videos](../charts-and-video.md): Diagrammspezifikationen, `render_native_chart`, Aufrufdiagramme und MP4-Export.
+- [Emulation nativer Funktionen](../native-emulation.md): Den p-code-Emulator von Ghidra befüllen und Ergebnis sowie Grenzen lesen.
 - [MCP-Kontrakte](../mcp-contracts.md) und [Agenten-Prompts](../mcp-prompts.md): Werkzeugergebnisse, Sitzungen und geführte Untersuchungen.
 - [Werkzeugkatalog](../mcp-contracts.md#generated-catalog): Beim Build erzeugtes Inventar von Werkzeugen, Providern und CLI-Befehlen.
 - [Roadmap](../roadmap.md): Geplante Arbeiten und Fortschrittsübersichten zu Fähigkeiten.

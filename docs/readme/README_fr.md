@@ -190,6 +190,8 @@ L'inspection statique JavaScript et .NET lit les fichiers fournis sans exécuter
 
 Les formats natifs et les hôtes pris en charge varient selon le fournisseur. Consultez [la configuration de Hopper et Ghidra](../installation.md#hopper), le [guide IDA](../ida-provider.md), [Kuna](../kuna-provider.md) et [la prise en charge expérimentale de Ghidra sous Windows](../windows-ghidra-p0.md). Ghidra prend aussi en charge [l'analyse DOS 16 bits](../ghidra-dos.md). Pour les gros binaires, augmentez son délai de démarrage avec `REA_GHIDRA_STARTUP_TIMEOUT_MS` / `REA_HOPPER_STARTUP_TIMEOUT_MS`. Pour le choix du fournisseur, consultez le [guide CLI](../cli.md#choose-a-provider). Vérifiez la [disponibilité dans les versions publiées](../installation.md#released-package-and-main) pour les fonctionnalités ajoutées depuis la dernière version npm.
 
+Pour créer des figures et des vidéos, consultez [graphiques, figures et vidéos](../charts-and-video.md) ; pour exécuter une fonction dans l'émulateur p-code de Ghidra, consultez l'[émulation des fonctions natives](../native-emulation.md).
+
 ## Études de cas
 
 <a href="https://rea.tools/fr/showcase/">
@@ -291,6 +293,8 @@ Commencez par les [guides pas à pas](https://rea.tools/fr/guides/) du site web.
 - [Installation et configuration](../installation.md) : enregistrement des agents, configuration des fournisseurs, mises à jour et désinstallation.
 - [Vérification et dépannage](../installation.md#check-readiness-for-your-task) : diagnostiquer un agent ou un moteur d'analyse donné.
 - [CLI et Evidence](../cli.md) : commandes, choix du fournisseur, snapshots, import/export et codes de sortie.
+- [Graphiques, figures et vidéos](../charts-and-video.md): spécifications de graphiques, `render_native_chart`, graphiques d'appels et export MP4.
+- [Émulation des fonctions natives](../native-emulation.md): alimenter l'émulateur p-code de Ghidra et lire son résultat et ses limites.
 - [Contrats MCP](../mcp-contracts.md) et [prompts pour agents](../mcp-prompts.md) : résultats des outils, sessions et investigations guidées.
 - [Catalogue des outils](../mcp-contracts.md#generated-catalog) : inventaire des outils, fournisseurs et commandes CLI, généré lors du build.
 - [Feuille de route](../roadmap.md) : travaux prévus et suivi des capacités.

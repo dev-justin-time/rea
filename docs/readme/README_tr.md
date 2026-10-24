@@ -189,6 +189,8 @@ Statik JavaScript ve .NET incelemesi, uygulamayı çalıştırmadan sağlanan do
 
 Yerel makine kodu içeren ikili dosya biçimleri ve ana bilgisayar desteği sağlayıcıya göre değişir. [Hopper ve Ghidra kurulumu](../installation.md#hopper), isteğe bağlı native MCP bridge'i de açıklayan [IDA rehberi](../ida-provider.md), [Kuna](../kuna-provider.md) ve [Windows için deneysel Ghidra desteği](../windows-ghidra-p0.md) belgelerine bakın. Ghidra ayrıca [16 bit DOS analizini](../ghidra-dos.md) destekler. Büyük ikili dosyalar için sağlayıcının başlatma zaman aşımını `REA_GHIDRA_STARTUP_TIMEOUT_MS` veya `REA_HOPPER_STARTUP_TIMEOUT_MS` ile artırın. Sağlayıcı seçimi için [CLI rehberine](../cli.md#choose-a-provider) bakın. En son npm sürümünden sonra eklenen özellikler için [sürümlerde kullanılabilirliği](../installation.md#released-package-and-main) kontrol edin.
 
+Şekil ve video oluşturmak için [grafikler, şekiller ve videolar](../charts-and-video.md) sayfasına; Ghidra p-code öykünücüsünde bir işlev çalıştırmak için [yerel işlevlerin öykünmesi](../native-emulation.md) sayfasına bakın.
+
 ## Örnek çalışmalar
 
 <a href="https://rea.tools/tr/showcase/">
@@ -290,6 +292,8 @@ Web sitesindeki [uygulamalı rehberlerden](https://rea.tools/tr/guides/) başlay
 - [Yükleme ve kurulum](../installation.md): ajan kaydı, sağlayıcı yapılandırması, güncellemeler ve kaldırma.
 - [Hazırlık ve sorun giderme](../installation.md#check-readiness-for-your-task): belirli bir ajanı veya analiz motorunu tanılama.
 - [CLI ve Evidence](../cli.md): komutlar, sağlayıcı seçimi, anlık görüntüler, içe/dışa aktarma ve çıkış durumları.
+- [Grafikler, şekiller ve videolar](../charts-and-video.md): grafik belirtimleri, `render_native_chart`, çağrı grafikleri ve MP4 dışa aktarma.
+- [Yerel işlevlerin öykünmesi](../native-emulation.md): ghidra p-code öykünücüsünü besleme, sonucu ve sınırlarını okuma.
 - [MCP sözleşmeleri](../mcp-contracts.md) ve [ajan istemleri](../mcp-prompts.md): araç sonuçları, oturumlar ve yönlendirmeli araştırmalar.
 - [Araç kataloğu](../mcp-contracts.md#generated-catalog): derleme sırasında oluşturulan araç, sağlayıcı ve CLI komutu envanteri.
 - [Yol haritası](../roadmap.md): planlanan çalışmalar ve yetenek takibi.

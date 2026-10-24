@@ -193,6 +193,8 @@ Với tệp nhị phân lớn, tăng hạn khởi động bằng `REA_GHIDRA_STA
 
 Định dạng mã máy và nền tảng chạy REA được hỗ trợ khác nhau tùy trình phân tích. Xem [thiết lập Hopper và Ghidra](../installation.md#hopper), [hướng dẫn IDA](../ida-provider.md), [Kuna](../kuna-provider.md) và [hỗ trợ Ghidra thử nghiệm trên Windows](../windows-ghidra-p0.md). Ghidra cũng hỗ trợ [phân tích DOS 16 bit](../ghidra-dos.md). Để chọn trình phân tích, xem [hướng dẫn CLI](../cli.md#choose-a-provider). Kiểm tra [khả năng sử dụng theo bản phát hành](../installation.md#released-package-and-main) đối với tính năng được bổ sung sau phiên bản npm mới nhất.
 
+Để tạo hình ảnh và video, hãy xem [biểu đồ, hình ảnh và video](../charts-and-video.md); để chạy một hàm trong trình mô phỏng p-code của Ghidra, hãy xem [mô phỏng hàm gốc](../native-emulation.md).
+
 ## Các nghiên cứu điển hình
 
 <a href="https://rea.tools/vi/showcase/">
@@ -294,6 +296,8 @@ Bắt đầu với [hướng dẫn thực hành](https://rea.tools/vi/guides/) t
 - [Cài đặt và thiết lập](../installation.md): đăng ký tác nhân, cấu hình trình phân tích, cập nhật và gỡ cài đặt.
 - [Kiểm tra mức sẵn sàng và khắc phục sự cố](../installation.md#check-readiness-for-your-task): chẩn đoán một tác nhân hoặc bộ máy phân tích cụ thể.
 - [CLI và Evidence](../cli.md): lệnh, lựa chọn trình phân tích, ảnh chụp trạng thái, nhập/xuất và trạng thái thoát.
+- [Biểu đồ, hình ảnh và video](../charts-and-video.md): đặc tả biểu đồ, `render_native_chart`, biểu đồ lời gọi và xuất MP4.
+- [Mô phỏng hàm gốc](../native-emulation.md): nạp giá trị vào trình mô phỏng p-code của Ghidra và đọc kết quả cùng giới hạn.
 - [Hợp đồng MCP](../mcp-contracts.md) và [prompt cho tác nhân](../mcp-prompts.md): kết quả công cụ, phiên làm việc và điều tra có hướng dẫn.
 - [Danh mục công cụ](../mcp-contracts.md#generated-catalog): danh sách công cụ, trình phân tích và lệnh CLI được tạo khi dựng dự án.
 - [Lộ trình](../roadmap.md): công việc dự kiến và theo dõi các khả năng.

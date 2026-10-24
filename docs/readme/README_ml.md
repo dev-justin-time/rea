@@ -197,6 +197,8 @@ Ghidra, [16-bit DOS analysis](../ghidra-dos.md)-ഉം പിന്തുണയ�
 Provider തിരഞ്ഞെടുക്കാൻ [CLI guide](../cli.md#choose-a-provider) കാണുക.
 ഏറ്റവും പുതിയ npm release-നുശേഷം ചേർത്ത features അറിയാൻ [release availability](../installation.md#released-package-and-main) പരിശോധിക്കുക.
 
+ചിത്രങ്ങളും വീഡിയോകളും സൃഷ്ടിക്കാൻ [ചാർട്ടുകൾ, ചിത്രങ്ങൾ, വീഡിയോകൾ](../charts-and-video.md) കാണുക; Ghidra-യുടെ p-code എമുലേറ്ററിൽ ഒരു ഫംഗ്ഷൻ പ്രവർത്തിപ്പിക്കാൻ [നേറ്റീവ് ഫംഗ്ഷൻ എമുലേഷൻ](../native-emulation.md) കാണുക.
+
 ## ഉദാഹരണങ്ങൾ
 
 <a href="https://rea.tools/showcase/">
@@ -301,6 +303,8 @@ npx rea-agents@latest setup
 - [Installation and setup](../installation.md): agent registration, provider configuration, updates, uninstall.
 - [Readiness and troubleshooting](../installation.md#check-readiness-for-your-task): ഒരു agent-ന്റെയോ analysis engine-ന്റെയോ പ്രശ്നങ്ങൾ കണ്ടെത്തുക.
 - [CLI and Evidence](../cli.md): commands, provider തിരഞ്ഞെടുക്കൽ, snapshots, import/export, exit statuses.
+- [ചാർട്ടുകൾ, ചിത്രങ്ങൾ, വീഡിയോകൾ](../charts-and-video.md): ചാർട്ട് സ്പെസിഫിക്കേഷനുകൾ, `render_native_chart`, കോൾ ഗ്രാഫുകൾ, MP4 എക്സ്പോർട്ട്.
+- [നേറ്റീവ് ഫംഗ്ഷൻ എമുലേഷൻ](../native-emulation.md): Ghidra-യുടെ p-code എമുലേറ്ററിൽ മൂല്യങ്ങൾ നൽകി ഫലവും പരിധികളും വായിക്കൽ.
 - [MCP contracts](../mcp-contracts.md), [agent prompts](../mcp-prompts.md): tool results, sessions, guided investigations.
 - [Tool catalog](../mcp-contracts.md#generated-catalog): tools, providers, CLI commands എന്നിവയുടെ സ്വയമേവ സൃഷ്ടിച്ച പട്ടിക.
 - [Roadmap](../roadmap.md): ആസൂത്രണം ചെയ്ത പ്രവർത്തനങ്ങളും capability trackers-ഉം.

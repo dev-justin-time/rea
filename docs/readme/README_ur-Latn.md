@@ -243,6 +243,8 @@ Provider select karne ke liye [CLI guide](../cli.md#choose-a-provider) dekhein.
 Latest npm release ke baad add hone wale features ki
 [release availability](../installation.md#released-package-and-main) check karein.
 
+Tasveerein aur videos banane ke liye [charts, tasveerein aur videos](../charts-and-video.md) dekhein; Ghidra ke p-code emulator mein ek function chalane ke liye [native functions ki emulation](../native-emulation.md) dekhein.
+
 ## Amli misaalein
 
 <a href="https://rea.tools/showcase/">
@@ -378,6 +380,8 @@ Exact options, prerequisites aur result contracts ke liye:
 - [Installation aur setup](../installation.md): agent registration, provider configuration, updates aur uninstall.
 - [Readiness aur troubleshooting](../installation.md#check-readiness-for-your-task): ek agent ya analysis engine ka masla diagnose karein.
 - [CLI aur Evidence](../cli.md): commands, provider selection, snapshots, import/export aur exit statuses.
+- [Charts, tasveerein aur videos](../charts-and-video.md): chart specifications, `render_native_chart`, call graphs aur MP4 export.
+- [Native functions ki emulation](../native-emulation.md): ghidra ke p-code emulator ko seed karna aur result aur limits parhna.
 - [MCP contracts](../mcp-contracts.md) aur [agent prompts](../mcp-prompts.md): tool results, sessions aur guided investigations.
 - [Tool catalog](../mcp-contracts.md#generated-catalog): tools, providers aur CLI commands ki generated inventory.
 - [Roadmap](../roadmap.md): planned work aur capability trackers.

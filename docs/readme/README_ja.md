@@ -193,6 +193,8 @@ REA には Node.js 22.x（>=22.23.4）、24.x（>=24.22.1）、または 26+ (>=
 
 対応するネイティブ形式とホストは、プロバイダーによって異なります。[Hopper と Ghidra のセットアップ](../installation.md#hopper)、[IDA ガイド](../ida-provider.md)、[Kuna](../kuna-provider.md)、[Windows 向け Ghidra の実験的対応](../windows-ghidra-p0.md)を参照してください。Ghidra は [16 ビット DOS 分析](../ghidra-dos.md)にも対応しています。プロバイダーの選択は [CLI ガイド](../cli.md#choose-a-provider)を参照してください。最新の npm リリース以降に追加された機能については、[リリースでの利用可否](../installation.md#released-package-and-main)を確認してください。
 
+図や動画を作成するには[グラフ、図、動画](../charts-and-video.md)を、Ghidra の p-code エミュレーターで関数を実行するには[ネイティブ関数のエミュレーション](../native-emulation.md)を参照してください。
+
 ## 事例
 
 <a href="https://rea.tools/ja/showcase/">
@@ -296,6 +298,8 @@ npx rea-agents@latest setup
 - [インストールとセットアップ](../installation.md)：エージェントの登録、プロバイダーの設定、更新、アンインストール。
 - [準備状況の確認とトラブルシューティング](../installation.md#check-readiness-for-your-task)：特定のエージェントや分析エンジンを診断。
 - [CLI と Evidence](../cli.md)：コマンド、プロバイダーの選択、スナップショット、インポート／エクスポート、終了ステータス。
+- [グラフ、図、動画](../charts-and-video.md): グラフ仕様、`render_native_chart`、呼び出しグラフ、MP4 書き出し。
+- [ネイティブ関数のエミュレーション](../native-emulation.md): Ghidra の p-code エミュレーターへの投入と、結果と制限の確認。
 - [MCP 契約](../mcp-contracts.md)と[エージェント向けプロンプト](../mcp-prompts.md)：ツールの結果、セッション、ガイド付き調査。
 - [ツールカタログ](../mcp-contracts.md#generated-catalog)：ビルド時に生成されるツール、プロバイダー、CLI コマンドの一覧。
 - [ロードマップ](../roadmap.md)：計画中の作業と機能の進捗。

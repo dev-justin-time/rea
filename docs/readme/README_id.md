@@ -201,6 +201,8 @@ Untuk memilih penyedia, lihat [panduan CLI](../cli.md#choose-a-provider).
 
 Periksa [ketersediaan rilis](../installation.md#released-package-and-main) untuk mengetahui fitur yang ditambahkan setelah rilis npm terbaru.
 
+Untuk membuat gambar dan video, lihat [grafik, gambar, dan video](../charts-and-video.md); untuk menjalankan satu fungsi di emulator p-code Ghidra, lihat [emulasi fungsi native](../native-emulation.md).
+
 ## Contoh Penggunaan
 
 <a href="https://rea.tools/id/showcase/">
@@ -312,6 +314,8 @@ Untuk mengetahui opsi, prasyarat, dan kontrak hasil secara tepat:
 - [Instalasi dan penyiapan](../installation.md): pendaftaran agen, konfigurasi penyedia, pembaruan, dan penghapusan instalasi.
 - [Kesiapan dan pemecahan masalah](../installation.md#check-readiness-for-your-task): mendiagnosis satu agen atau mesin analisis.
 - [CLI dan Bukti](../cli.md): perintah, pemilihan penyedia, snapshot, impor/ekspor, dan status keluar.
+- [Grafik, gambar, dan video](../charts-and-video.md): spesifikasi grafik, `render_native_chart`, grafik pemanggilan, dan ekspor MP4.
+- [Emulasi fungsi native](../native-emulation.md): mengisi emulator p-code Ghidra dan membaca hasil serta batasannya.
 - [Kontrak MCP](../mcp-contracts.md) dan [prompt agen](../mcp-prompts.md): hasil alat, sesi, dan investigasi terpandu.
 - [Katalog alat](../mcp-contracts.md#generated-catalog): inventaris alat, penyedia, dan perintah CLI yang dibuat secara otomatis.
 - [Peta jalan](../roadmap.md): pekerjaan yang direncanakan dan pelacak kemampuan.

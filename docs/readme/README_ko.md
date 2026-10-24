@@ -193,6 +193,8 @@ REA에는 Node.js 22.x(>=22.23.4), 24.x(>=24.22.1) 또는 26+ (>=26.12.1)와 npm
 
 지원하는 네이티브 형식과 호스트는 제공자마다 다릅니다. [Hopper 및 Ghidra 설정](../installation.md#hopper), [IDA 가이드](../ida-provider.md)(선택 사항인 네이티브 MCP 브리지 포함), [Kuna](../kuna-provider.md), [실험적 Windows Ghidra 지원](../windows-ghidra-p0.md)을 참고하세요. Ghidra는 [16비트 DOS 분석](../ghidra-dos.md)도 지원합니다. 큰 바이너리를 분석할 때는 `REA_GHIDRA_STARTUP_TIMEOUT_MS` 또는 `REA_HOPPER_STARTUP_TIMEOUT_MS`로 제공자의 시작 제한 시간을 늘리세요. 제공자 선택은 [CLI 가이드](../cli.md#choose-a-provider)를 참고하세요. 최신 npm 릴리스 이후 추가된 기능은 [릴리스에서의 사용 가능 여부](../installation.md#released-package-and-main)를 확인하세요.
 
+그림과 동영상을 만들려면 [차트, 그림, 동영상](../charts-and-video.md)을, Ghidra p-code 에뮬레이터에서 함수를 실행하려면 [네이티브 함수 에뮬레이션](../native-emulation.md)을 참고하세요.
+
 ## 사례
 
 <a href="https://rea.tools/ko/showcase/">
@@ -296,6 +298,8 @@ npx rea-agents@latest setup
 - [설치 및 설정](../installation.md): 에이전트 등록, 제공자 설정, 업데이트, 제거.
 - [준비 상태 확인 및 문제 해결](../installation.md#check-readiness-for-your-task): 특정 에이전트 또는 분석 엔진 진단.
 - [CLI 및 Evidence](../cli.md): 명령, 제공자 선택, 스냅샷, 가져오기/내보내기, 종료 상태.
+- [차트, 그림, 동영상](../charts-and-video.md): 차트 사양, `render_native_chart`, 호출 그래프, MP4 내보내기.
+- [네이티브 함수 에뮬레이션](../native-emulation.md): Ghidra p-code 에뮬레이터에 값을 넣고 결과와 한계를 읽습니다.
 - [MCP 계약](../mcp-contracts.md) 및 [에이전트 프롬프트](../mcp-prompts.md): 도구 결과, 세션, 안내에 따른 조사.
 - [도구 카탈로그](../mcp-contracts.md#generated-catalog): 빌드 시 생성되는 도구, 제공자, CLI 명령 목록.
 - [로드맵](../roadmap.md): 계획된 작업과 기능 진행 상황.

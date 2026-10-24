@@ -193,6 +193,8 @@ Dla dużych plików zwiększ czas uruchomienia przez `REA_GHIDRA_STARTUP_TIMEOUT
 
 Obsługiwane formaty natywne i platformy zależą od dostawcy analizy. Zobacz [konfigurację Hoppera i Ghidry](../installation.md#hopper), [przewodnik IDA](../ida-provider.md), [Kuna](../kuna-provider.md) oraz [eksperymentalną obsługę Ghidry w systemie Windows](../windows-ghidra-p0.md). Ghidra obsługuje też [analizę 16-bitowego DOS-a](../ghidra-dos.md). Wybór dostawcy opisuje [przewodnik CLI](../cli.md#choose-a-provider). Sprawdź [dostępność w wydaniach](../installation.md#released-package-and-main) dla funkcji dodanych po najnowszym wydaniu npm.
 
+Aby tworzyć ryciny i filmy, zobacz [wykresy, ryciny i filmy](../charts-and-video.md); aby uruchomić funkcję w emulatorze p-code Ghidry, zobacz [emulację funkcji natywnych](../native-emulation.md).
+
 ## Przykłady zastosowań
 
 <a href="https://rea.tools/pl/showcase/">
@@ -294,6 +296,8 @@ Zacznij od [przewodników z przykładami](https://rea.tools/pl/guides/) na stron
 - [Instalacja i konfiguracja](../installation.md): rejestracja agentów, konfiguracja dostawców analizy, aktualizacje i odinstalowanie.
 - [Gotowość i rozwiązywanie problemów](../installation.md#check-readiness-for-your-task): diagnostyka jednego agenta lub silnika analizy.
 - [CLI i Evidence](../cli.md): polecenia, wybór dostawcy, migawki, import/eksport i kody zakończenia.
+- [Wykresy, ryciny i filmy](../charts-and-video.md): specyfikacje wykresów, `render_native_chart`, wykresy wywołań i eksport MP4.
+- [Emulacja funkcji natywnych](../native-emulation.md): zasilanie emulatora p-code Ghidry i odczyt wyniku oraz ograniczeń.
 - [Kontrakty MCP](../mcp-contracts.md) i [prompty dla agentów](../mcp-prompts.md): wyniki narzędzi, sesje i prowadzone analizy.
 - [Katalog narzędzi](../mcp-contracts.md#generated-catalog): generowany podczas kompilacji wykaz narzędzi, dostawców i poleceń CLI.
 - [Plan rozwoju](../roadmap.md): planowane prace i śledzenie funkcjonalności.

@@ -193,6 +193,8 @@ npx rea-agents@latest setup
 
 تختلف صيغ ملفات الشيفرة الأصلية والأنظمة المضيفة المدعومة باختلاف الموفّر. راجع [إعداد Hopper وGhidra](../installation.md#hopper)، و[دليل IDA](../ida-provider.md)، [Kuna](../kuna-provider.md)، و[دعم Ghidra التجريبي على Windows](../windows-ghidra-p0.md). يدعم Ghidra أيضًا [تحليل DOS ذي 16 بت](../ghidra-dos.md). لاختيار الموفّر، راجع [دليل CLI](../cli.md#choose-a-provider). تحقّق من [توفر الميزات في الإصدارات](../installation.md#released-package-and-main) للميزات المضافة بعد أحدث إصدار على npm.
 
+لإنشاء الأشكال ومقاطع الفيديو، راجع [المخططات والصور والفيديوهات](../charts-and-video.md)؛ ولتشغيل دالة واحدة في محاكي p-code الخاص بـ Ghidra، راجع [محاكاة الدوال الأصلية](../native-emulation.md).
+
 ## دراسات الحالة
 
 <a href="https://rea.tools/ar/showcase/">
@@ -296,6 +298,8 @@ npx rea-agents@latest setup
 - [التثبيت والإعداد](../installation.md): تسجيل الوكلاء، وتهيئة الموفّرين، والتحديثات، وإلغاء التثبيت.
 - [الجاهزية واستكشاف الأخطاء](../installation.md#check-readiness-for-your-task): تشخيص وكيل أو محرك تحليل محدد.
 - [CLI وEvidence](../cli.md): الأوامر، واختيار الموفّر، واللقطات، والاستيراد/التصدير، وحالات الخروج.
+- [المخططات والصور والفيديوهات](../charts-and-video.md): مواصفات المخططات، وأداة `render_native_chart`، ومخططات الاستدعاء، وتصدير MP4.
+- [محاكاة الدوال الأصلية](../native-emulation.md): تغذية محاكي p-code في Ghidra وقراءة النتيجة والحدود.
 - [عقود MCP](../mcp-contracts.md) و[تعليمات الوكلاء](../mcp-prompts.md): نتائج الأدوات، والجلسات، والاستقصاءات الموجّهة.
 - [كتالوج الأدوات](../mcp-contracts.md#generated-catalog): قائمة الأدوات والموفّرين وأوامر CLI المولّدة أثناء البناء.
 - [خطة العمل](../roadmap.md): الأعمال المخطط لها ومتابعة القدرات.

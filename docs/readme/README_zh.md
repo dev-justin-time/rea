@@ -191,6 +191,8 @@ REA 需要 Node.js 22.x（>=22.23.4）、24.x（>=24.22.1）或 26+ (>=26.12.1)�
 
 不同提供方支持的原生格式和主机系统有所不同。请参阅 [Hopper 与 Ghidra 设置](../installation.md#hopper)、[IDA 指南](../ida-provider.md)、[Kuna](../kuna-provider.md)和[实验性 Windows Ghidra 支持](../windows-ghidra-p0.md)。Ghidra 也支持 [16 位 DOS 分析](../ghidra-dos.md)。提供方选择见 [CLI 指南](../cli.md#choose-a-provider)。对于最新 npm 版本发布后新增的功能，请查看[发布可用性](../installation.md#released-package-and-main)。
 
+要创建插图和视频，请参阅[图表、插图与视频](../charts-and-video.md)；要在 Ghidra 的 p-code 模拟器中运行函数，请参阅[原生函数模拟](../native-emulation.md)。
+
 ## 案例
 
 <a href="https://rea.tools/zh-CN/showcase/">
@@ -294,6 +296,8 @@ npx rea-agents@latest setup
 - [安装与设置](../installation.md)：智能体注册、提供方配置、更新和卸载。
 - [就绪检查与故障排查](../installation.md#check-readiness-for-your-task)：诊断特定智能体或分析引擎。
 - [CLI 与 Evidence](../cli.md)：命令、提供方选择、快照、导入/导出和退出状态。
+- [图表、插图与视频](../charts-and-video.md): 图表规范、`render_native_chart`、调用图与 MP4 导出。
+- [原生函数模拟](../native-emulation.md): 为 Ghidra 的 p-code 模拟器填充输入并读取结果与限制。
 - [MCP 契约](../mcp-contracts.md)和[智能体提示词](../mcp-prompts.md)：工具结果、会话和引导式调查。
 - [工具目录](../mcp-contracts.md#generated-catalog)：构建时生成的工具、提供方和 CLI 命令清单。
 - [路线图](../roadmap.md)：计划中的工作和能力跟踪。

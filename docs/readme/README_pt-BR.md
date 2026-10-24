@@ -193,6 +193,8 @@ Para binários grandes, aumente o prazo de inicialização com `REA_GHIDRA_START
 
 Os formatos nativos e os sistemas anfitriões compatíveis variam por provedor. Consulte [configuração do Hopper e Ghidra](../installation.md#hopper), o [guia do IDA](../ida-provider.md), [Kuna](../kuna-provider.md) e o [suporte experimental ao Ghidra no Windows](../windows-ghidra-p0.md). O Ghidra também oferece [análise de DOS de 16 bits](../ghidra-dos.md). Para selecionar um provedor, consulte o [guia da CLI](../cli.md#choose-a-provider). Verifique a [disponibilidade nas versões](../installation.md#released-package-and-main) das funcionalidades adicionadas após a versão mais recente no npm.
 
+Para criar figuras e vídeos, consulte [gráficos, figuras e vídeos](../charts-and-video.md); para executar uma função no emulador p-code do Ghidra, consulte a [emulação de funções nativas](../native-emulation.md).
+
 ## Casos de uso
 
 <a href="https://rea.tools/pt-BR/showcase/">
@@ -294,6 +296,8 @@ Comece pelos [guias práticos](https://rea.tools/pt-BR/guides/) do site. Para op
 - [Instalação e configuração](../installation.md): registro de agentes, configuração de provedores, atualizações e desinstalação.
 - [Prontidão e solução de problemas](../installation.md#check-readiness-for-your-task): diagnóstico de um agente ou motor de análise específico.
 - [CLI e Evidence](../cli.md): comandos, seleção de provedores, snapshots, importação/exportação e status de saída.
+- [Gráficos, figuras e vídeos](../charts-and-video.md): especificações de gráficos, `render_native_chart`, gráficos de chamadas e exportação MP4.
+- [Emulação de funções nativas](../native-emulation.md): alimentar o emulador p-code do Ghidra e ler o resultado e os limites.
 - [Contratos MCP](../mcp-contracts.md) e [prompts para agentes](../mcp-prompts.md): resultados das ferramentas, sessões e investigações guiadas.
 - [Catálogo de ferramentas](../mcp-contracts.md#generated-catalog): inventário de ferramentas, provedores e comandos da CLI gerado durante o build.
 - [Roadmap](../roadmap.md): trabalho planejado e acompanhamento das capacidades.

@@ -193,6 +193,8 @@ Para binarios grandes, aumenta el plazo de inicio mediante `REA_GHIDRA_STARTUP_T
 
 Los formatos nativos y los sistemas anfitriones compatibles varían según el proveedor. Consulta [configuración de Hopper y Ghidra](../installation.md#hopper), la [guía de IDA](../ida-provider.md), [Kuna](../kuna-provider.md) y la [compatibilidad experimental de Ghidra en Windows](../windows-ghidra-p0.md). Ghidra también admite [análisis de DOS de 16 bits](../ghidra-dos.md). Para elegir un proveedor, consulta la [guía de CLI](../cli.md#choose-a-provider). Comprueba la [disponibilidad por versión](../installation.md#released-package-and-main) de las funciones añadidas después de la última versión publicada en npm.
 
+Para crear figuras y vídeos, consulta [gráficos, figuras y vídeos](../charts-and-video.md); para ejecutar una función en el emulador p-code de Ghidra, consulta la [emulación de funciones nativas](../native-emulation.md).
+
 ## Casos prácticos
 
 <a href="https://rea.tools/es/showcase/">
@@ -294,6 +296,8 @@ Empieza con las [guías prácticas](https://rea.tools/es/guides/) del sitio web.
 - [Instalación y configuración](../installation.md): registro de agentes, configuración de proveedores, actualizaciones y desinstalación.
 - [Preparación y resolución de problemas](../installation.md#check-readiness-for-your-task): diagnóstico de un agente o motor de análisis concreto.
 - [CLI y Evidence](../cli.md): comandos, selección de proveedores, instantáneas, importación/exportación y estados de salida.
+- [Gráficos, figuras y vídeos](../charts-and-video.md): especificaciones de gráficos, `render_native_chart`, gráficos de llamadas y exportación MP4.
+- [Emulación de funciones nativas](../native-emulation.md): sembrar el emulador p-code de Ghidra y leer su resultado y límites.
 - [Contratos de MCP](../mcp-contracts.md) y [prompts para agentes](../mcp-prompts.md): resultados de herramientas, sesiones e investigaciones guiadas.
 - [Catálogo de herramientas](../mcp-contracts.md#generated-catalog): inventario de herramientas, proveedores y comandos de CLI generado durante la compilación.
 - [Hoja de ruta](../roadmap.md): trabajo previsto y seguimiento de capacidades.

@@ -190,6 +190,8 @@ L'ispezione statica di JavaScript e .NET legge i file forniti senza eseguire l'a
 
 I formati nativi e il supporto host variano in base al provider. Vedi la [configurazione di Hopper e Ghidra](../installation.md#hopper), la [guida IDA](../ida-provider.md), [Kuna](../kuna-provider.md) e il [supporto sperimentale Windows Ghidra](../windows-ghidra-p0.md). Ghidra supporta anche l'[analisi DOS a 16 bit](../ghidra-dos.md). Per binari di grandi dimensioni, aumenta il timeout di avvio con `REA_GHIDRA_STARTUP_TIMEOUT_MS` / `REA_HOPPER_STARTUP_TIMEOUT_MS`. Per la selezione del provider, vedi la [guida CLI](../cli.md#choose-a-provider). Controlla la [disponibilità delle release](../installation.md#released-package-and-main) per le funzionalità aggiunte dall'ultima release npm.
 
+Per creare figure e video, consulta [grafici, figure e video](../charts-and-video.md); per eseguire una funzione nell'emulatore p-code di Ghidra, consulta l'[emulazione di funzioni native](../native-emulation.md).
+
 ## Showcase
 
 <a href="https://rea.tools/it/showcase/">
@@ -291,6 +293,8 @@ Inizia dalle [guide pratiche](https://rea.tools/it/guides/) del sito web. Per op
 - [Installazione e configurazione](../installation.md): registrazione agente, configurazione provider, aggiornamenti e disinstallazione.
 - [Pronto all'uso e risoluzione dei problemi](../installation.md#check-readiness-for-your-task): diagnostica un agente o un motore di analisi.
 - [CLI ed Evidence](../cli.md): comandi, selezione provider, snapshot, import/export e stati di uscita.
+- [Grafici, figure e video](../charts-and-video.md): specifiche dei grafici, `render_native_chart`, grafici delle chiamate ed esportazione MP4.
+- [Emulazione di funzioni native](../native-emulation.md): alimentare l'emulatore p-code di Ghidra e leggere esito e limiti.
 - [Contratti MCP](../mcp-contracts.md) e [prompt agente](../mcp-prompts.md): risultati degli strumenti, sessioni e indagini guidate.
 - [Catalogo strumenti](../mcp-contracts.md#generated-catalog): inventario generato di strumenti, provider e comandi CLI.
 - [Roadmap](../roadmap.md): lavoro pianificato e tracker delle capacità.
